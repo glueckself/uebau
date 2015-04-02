@@ -15,6 +15,7 @@ and|end|isnum|islist|isfun|fun|if|then|else|let|in|not|head|tail|";"|"="|"+"|"-"
 
 {ID} {
     printf("ident %s\n", yytext);
+}
 
 {DIGITS} {
     printf("num %u\n", strtoul(yytext, NULL, 0));
