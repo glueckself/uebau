@@ -1,5 +1,4 @@
 %{
-/* need this for the call to atof() below */
 #include <stdio.h>
 #include <stdlib.h>
 %}
@@ -27,8 +26,9 @@ and|end|isnum|islist|isfun|fun|if|then|else|let|in|not|head|tail|";"|"="|"+"|"-"
     
 
 [ \t\n]+        //eat whitespaces
+"//".*		//eat comments
 
-"//".*
+.		return 1;
 %%
 
 int main(int argc, char *argv[]) {
@@ -40,5 +40,5 @@ int main(int argc, char *argv[]) {
 	else
 		yyin=stdin;
 
-	return yylex();
+        return yylex();
 }
