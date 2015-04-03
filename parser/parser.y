@@ -36,31 +36,32 @@
 %token ARROW
 
 %%
-Program: Def SEMICOLON 
+Program: Def SEMICOLON  { printf("Prog Def\n"); }
+       | Program Def SEMICOLON { printf("Next Program\n"); }
        ;
 
-Def: IDENT EQUAL Lambda
+Def: IDENT EQUAL Lambda { printf("Definition\n"); }
    ;
 
-Lambda:	FUN IDENT ARROW Expr END
+Lambda:	FUN IDENT ARROW Expr END {printf("Lambda\n");}
       ;
 
-Expr: IF Expr THEN Expr ELSE Expr END
-    | Lambda
-    | LET IDENT EQUAL Expr IN Expr END
-    | EExpr
-    | AddTerm
-    | MultTerm
-    | AndTerm
-    | DotTerm
-    | Term MINUS Term
-    | Term LESS Term
-    | Term EQUAL Term
-    | Expr Term /* Funktionsaufruf */
+Expr: IF Expr THEN Expr ELSE Expr END { printf("ExprIf\n"); }
+    | Lambda {printf("ExprLambda\n");}
+    | LET IDENT EQUAL Expr IN Expr END {printf("ExprLet\n");}
+    | EExpr {printf("ExprEExpr\n");}
+    | AddTerm {printf("ExprAddTerm\n");}
+    | MultTerm {printf("ExprMultTerm\n");}
+    | AndTerm {printf("ExprAndTerm\n");}
+    | DotTerm {printf("ExprDotTerm\n");}
+    | Term MINUS Term {printf("ExprMinusTerm\n");}
+    | Term LESS Term {printf("ExprLessTerm\n");}
+    | Term EQUAL Term {printf("ExprEqualTerm\n");}
+    | Expr Term {printf("ExprFuncTerm\n");} /* Funktionsaufruf */
     ;
 
-EExpr: Term
-     | KExpr
+EExpr: Term {printf("EExprTerm\n");}
+     | KExpr {printf("EExprKExpr\n");}
      ;
 
 KExpr: NOT EExpr
@@ -87,7 +88,7 @@ DotTerm: Term DOT Term
        | DotTerm DOT Term;
        ;
 
-Term: LBRACKET Expr RBRACKET
-    | NUM
-    | IDENT
+Term: LBRACKET Expr RBRACKET {printf("TermExpr\n");}
+    | NUM { printf("Number: %d\n", $1); }
+    | IDENT { printf("Ident: %s\n", $1); }
     ;
