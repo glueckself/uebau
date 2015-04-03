@@ -48,16 +48,44 @@ Lambda:	FUN IDENT ARROW Expr END
 Expr: IF Expr THEN Expr ELSE Expr END
     | Lambda
     | LET IDENT EQUAL Expr IN Expr END
-    | Term
-    | { NOT | HEAD | TAIL | ISNUM | ISLIST | ISFUN } Term
-    | Term { PLUS Term }
+    | EExpr
+    | AddTerm
+    | MultTerm
+    | AndTerm
+    | DotTerm
     | Term MINUS Term
-    | Term { MULT Term }
-    | Term { AND Term }
-    | Term { DOT Term }
-    | Term LESS Term | Term EQUAL Term
+    | Term LESS Term
+    | Term EQUAL Term
     | Expr Term /* Funktionsaufruf */
     ;
+
+EExpr: Term
+     | KExpr
+     ;
+
+KExpr: NOT EExpr
+     | HEAD EExpr
+     | TAIL EExpr
+     | ISNUM EExpr
+     | ISLIST EExpr
+     | ISFUN EExpr
+     ;
+
+AddTerm: Term PLUS Term
+       | AddTerm PLUS Term
+       ;
+
+MultTerm: Term MULT Term
+        | MultTerm MULT Term
+        ;
+
+AndTerm: Term AND Term
+       | AndTerm AND Term
+       ;
+
+DotTerm: Term DOT Term
+       | DotTerm DOT Term;
+       ;
 
 Term: LBRACKET Expr RBRACKET
     | NUM

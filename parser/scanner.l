@@ -40,12 +40,12 @@ tail    return TAIL;
 }
 
 {DIGITS} {
-	yyval.num=strtoul(yytext, NULL, 0);
+	yylval.num=strtoul(yytext, NULL, 0);
 	return NUM;
 }
 
 {HEX} {
-	yyval.num=strtoul(&(yytext[1]), NULL, 16);
+	yylval.num=strtoul(&(yytext[1]), NULL, 16);
 	return NUM;
 }
     
@@ -65,5 +65,13 @@ int main(int argc, char *argv[]) {
 	else
 		yyin=stdin;
 
-		yyparse();
+	if(yyparse())
+		return 2; // 1 is handled by exit above
 }
+
+
+
+void yyerror (char const *s) {
+  fprintf (stderr, "%s\n", s);
+}
+

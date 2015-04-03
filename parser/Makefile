@@ -1,7 +1,7 @@
 all: parser
 
 clean:
-	rm -f scanner lex.yy.c y.tab.*
+	rm -f parser lex.yy.c y.tab.*
 
 y.tab.c: parser.y
 	bison -yd parser.y
