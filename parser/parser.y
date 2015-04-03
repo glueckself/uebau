@@ -90,5 +90,5 @@ DotTerm: Term DOT Term
 
 Term: LBRACKET Expr RBRACKET {printf("TermExpr\n");}
     | NUM { printf("Number: %d\n", $1); }
-    | IDENT { printf("Ident: %s\n", $1); }
+    | IDENT { printf("Ident: %s\n", $1); free($1); }
     ;
