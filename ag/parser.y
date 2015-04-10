@@ -1,8 +1,9 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include "symbols.h"
 %}
-
 
 %token NUM
 %token IDENT
@@ -32,41 +33,65 @@
 %token RBRACKET
 %token ARROW
 
-@attributes {unsigned int val;}	NUM
-@attributes {char *val;}	IDENT
-@attributes {symbol_table *sym;} DefIdent
+@autoinh sym
+@autosyn globVal;
 
+@attributes {unsigned int val;} NUM
+@attributes {char *val;}        IDENT
+@attributes {symbol_t *globSym;} Program
+@attributes {symbol_t *globSym; char *globVal;} Def
+@attributes {symbol_t *sym;} Lambda Expr EExpr KExpr AddTerm MultTerm DotTerm AndTerm Term
+
+@traversal @postorder t
 
 %%
-Program: Def SEMICOLON  { printf("Prog Def\n"); }
-       | Program Def SEMICOLON { printf("Next Program\n"); }
+Program: @{ @i @Program.globSym@ = mkList(""); @}
+       | Def SEMICOLON @{
+             @i @Program.globSym@ = mkList(@Def.globVal@);
+             @i @Def.globSym@ = @Program.globSym@;
+         @}
+       | Program Def SEMICOLON @{
+             @i @Program.0.globSym@ = addGlobalSymbol(@Program.1.globSym@, @Def.globVal@);
+             @i @Def.globSym@ = @Program.globSym@;
+         @}
        ;
 
-Def: DefIdent EQUAL Lambda { printf("Definition\n"); }
+       //DefIdent überall sichtbar
+Def: IDENT EQUAL Lambda @{
+        @i @Lambda.sym@ = addSymbol(@Def.globSym@, @IDENT.val@);
+        @i @Def.globVal@ = @IDENT.val@;
+     @}
    ;
 
-DefIdent: IDENT
-	;
-
-Lambda:	FUN DefIdent ARROW Expr END {printf("Lambda\n");}
+	//DefIdent in expr sichtbar
+Lambda:	FUN IDENT ARROW Expr END @{
+            @t checkUnknownSymbol(@Lambda.sym@, @IDENT.val@);
+            
+            @i @Expr.sym@ = addSymbol(@Lambda.sym@, @IDENT.val@);
+        @}
       ;
 
-Expr: IF Expr THEN Expr ELSE Expr END { printf("ExprIf\n"); }
-    | Lambda {printf("ExprLambda\n");}
-    | LET DefIdent EQUAL Expr IN Expr END {printf("ExprLet\n");}
-    | EExpr {printf("ExprEExpr\n");}
-    | AddTerm {printf("ExprAddTerm\n");}
-    | MultTerm {printf("ExprMultTerm\n");}
-    | AndTerm {printf("ExprAndTerm\n");}
-    | DotTerm {printf("ExprDotTerm\n");}
-    | Term MINUS Term {printf("ExprMinusTerm\n");}
-    | Term LESS Term {printf("ExprLessTerm\n");}
-    | Term EQUAL Term {printf("ExprEqualTerm\n");}
-    | Expr Term {printf("ExprFuncTerm\n");} /* Funktionsaufruf */
+Expr: IF Expr THEN Expr ELSE Expr END
+    | Lambda
+    | LET IDENT EQUAL Expr IN Expr END @{ 
+          @t checkUnknownSymbol(@Expr.1.sym@, @IDENT.val@);
+          @t checkUnknownSymbol(@Expr.0.sym@, @IDENT.val@); 
+          
+          @i @Expr.2.sym@ = mergeLists(mergeLists(mkList(@IDENT.val@), @Expr.0.sym@), @Expr.1.sym@);
+      @}
+    | EExpr
+    | AddTerm
+    | MultTerm
+    | AndTerm
+    | DotTerm
+    | Term MINUS Term
+    | Term LESS Term
+    | Term EQUAL Term
+    | Expr Term
     ;
 
-EExpr: Term {printf("EExprTerm\n");}
-     | KExpr {printf("EExprKExpr\n");}
+EExpr: Term
+     | KExpr
      ;
 
 KExpr: NOT EExpr
@@ -93,7 +118,8 @@ DotTerm: Term DOT Term
        | DotTerm DOT Term;
        ;
 
-Term: LBRACKET Expr RBRACKET {printf("TermExpr\n");}
-    | NUM { printf("Number: %d\n", $1); }
-    | IDENT { printf("Ident: %s\n", $1); free($1); }
+Term: LBRACKET Expr RBRACKET
+    | NUM
+    | IDENT @{ @t checkKnownSymbol(@Term.sym@, @IDENT.val@); @}
     ;
+

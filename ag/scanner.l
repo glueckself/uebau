@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "y.tab.h"
+#include "symbols.h"
 %}
 
 DIGITS	[0-9]*
@@ -35,18 +36,15 @@ tail    return TAIL;
 "->"    return ARROW;
 
 {ID} {
-	yylval.ident=strdup(yytext);
-	return IDENT;
+	return IDENT; @{ @IDENT.val@ = strdup(yytext); @}
 }
 
 {DIGITS} {
-	yylval.num=strtoul(yytext, NULL, 0);
-	return NUM;
+	return NUM; @{ @NUM.val@ = strtoul(yytext, NULL, 0); @}
 }
 
 {HEX} {
-	yylval.num=strtoul(&(yytext[1]), NULL, 16);
-	return NUM;
+	return NUM; @{ @NUM.val@ = strtoul(&(yytext[1]), NULL, 16); @}
 }
     
 
