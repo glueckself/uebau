@@ -14,3 +14,6 @@ lex.yy.c: oxout.l
 
 ag: lex.yy.c y.tab.c symbols.c symbols.h
 	gcc -o ag lex.yy.c y.tab.c symbols.c -lfl
+
+debug: lex.yy.c y.tab.c symbols.c symbols.h
+	gcc -DDEBUG -g -o ag lex.yy.c y.tab.c symbols.c -lfl
