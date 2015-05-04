@@ -45,7 +45,8 @@
 @traversal @postorder t
 
 %%
-Program: Def SEMICOLON @{
+Program: @{ @i @Program.globSym@ = NULL; @}
+       |  Def SEMICOLON @{
              @i @Program.globSym@ = mkList(@Def.globVal@);
              @i @Def.globSym@ = @Program.globSym@;
          @}
