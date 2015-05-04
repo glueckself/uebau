@@ -45,11 +45,15 @@
 @traversal @postorder t
 
 %%
-Program: @{ @i @Program.globSym@ = NULL; @}
-       |  Def SEMICOLON @{
+File:
+    | Program
+    ;
+
+Program: Def SEMICOLON @{
              @i @Program.globSym@ = mkList(@Def.globVal@);
              @i @Def.globSym@ = @Program.globSym@;
          @}
+/*       | @{ @i @Program.globSym@ = NULL; @}*/
        | Program Def SEMICOLON @{
              @i @Program.0.globSym@ = addGlobalSymbol(@Program.1.globSym@, @Def.globVal@);
              @i @Def.globSym@ = @Program.globSym@;
