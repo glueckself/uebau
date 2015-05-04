@@ -55,7 +55,7 @@ Program: Def SEMICOLON @{
          @}
 /*       | @{ @i @Program.globSym@ = NULL; @}*/
        | Program Def SEMICOLON @{
-             @i @Program.0.globSym@ = addGlobalSymbol(@Program.1.globSym@, @Def.globVal@);
+             @i @Program.globSym@ = addGlobalSymbol(@Program.1.globSym@, @Def.globVal@);
              @i @Def.globSym@ = @Program.globSym@;
          @}
        ;
@@ -64,6 +64,7 @@ Program: Def SEMICOLON @{
 Def: IDENT EQUAL Lambda @{
         @i @Lambda.sym@ = addSymbol(@Def.globSym@, @IDENT.val@);
         @i @Def.globVal@ = @IDENT.val@;
+        @t checkGlobalSymbol(@Def.globSym@, @IDENT.val@);
      @}
    ;
 

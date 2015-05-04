@@ -54,9 +54,27 @@ void checkKnownSymbol(symbol_t *list, char *name) {
     }
 }
 
-void checkUnknownSymbol(symbol_t* symlist, char* name) {
+void checkUnknownSymbol(symbol_t* symlist, char *name) {
     if(lookupSymbol(symlist, name) != NULL) {
         printf("Symbol already defined: %s\n", name);
+        exit(3);
+    }
+}
+
+void checkGlobalSymbol(symbol_t *symlist, char *name) {
+    symbol_t *item;
+    int symCount=0;
+    
+    if(symlist == NULL)
+        return;
+    
+    for(item=symlist; item != NULL; item=item->next) {
+        if(strcmp(name, item->name) == 0)
+            symCount++;
+    }
+    
+    if(symCount != 1) {
+        printf("Global symbol already defined: %s\n", name);
         exit(3);
     }
 }
