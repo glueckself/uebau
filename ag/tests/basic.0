@@ -1,0 +1,70 @@
+// basic
+foo0 = fun bar0 -> 42 end ;
+
+// use global variable defined later
+foo1 = fun bar0 -> 
+        let bar1 = 42 in foo7 end
+end ;
+
+// use global variable defined right now
+foo2 = fun bar0 -> foo2 end ;
+
+// use global variable defined later
+foo3 = fun bar0 -> foo0 end ;
+
+foo4 = fun bar0 -> 42 end ;
+
+foo5 = fun x -> x end ;
+
+// use global variable in let defined after
+foo6 = fun bar0 -> 
+        let bar1 = 42 in foo8 end
+end ;
+
+foo7 = fun x -> x end ;
+
+// use global variable in let defined before
+foo8 = fun bar0 -> 
+        let bar1 = 42 in foo1 end
+end ;
+
+// use fun name in fun
+foo9 = fun bar0 -> 
+        bar0
+end ;
+
+// use fun name in fun in fun 
+foo10 = fun bar0 -> 
+    fun bar1 -> 
+        bar0
+    end
+end ;
+
+// use fun name in let
+foo11 = fun bar0 -> 
+    let bar1 = 42 in bar0 end 
+end ;
+
+// use fun name in let in let
+foo12 = fun bar0 -> 
+    let bar1 = 42 in 
+        let bar2 = 42 in bar0 end 
+    end 
+end ;
+
+// use global name in fun in fun 
+foo13 = fun bar0 -> 
+    fun bar1 -> 
+        foo1
+    end
+end ;
+
+// use global name in let in let
+foo14 = fun bar0 -> 
+    let bar1 = 42 in 
+        let bar2 = 42 in foo1 end 
+    end 
+end ;
+
+plusn = fun x -> fun y -> let four = 4 in x+y+four end end end;  
+plus3 = fun z -> (plusn 3) z end; 

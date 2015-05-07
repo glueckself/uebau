@@ -1,0 +1,6 @@
+foo0 = fun bar0 -> 42 end ;
+
+// bar1 only visible after in
+foo1 = fun bar0 -> 
+      let bar1 = foo0 in 42 end
+end ;

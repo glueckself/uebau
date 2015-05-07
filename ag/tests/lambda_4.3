@@ -1,0 +1,6 @@
+// reuse lambda ident in nested let
+foo0 = fun bar0 -> 
+        let bar1 = 42 in 
+                let bar0 = 42 in 42 end
+        end 
+end ;

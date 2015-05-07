@@ -1,0 +1,8 @@
+// reuse outer lambda ident in double nested lambda
+foo0 = fun bar0 -> 
+    fun bar1 -> 
+        fun bar0 -> 
+                let bar1 = 42 in 42 end 
+        end 
+    end
+end ;

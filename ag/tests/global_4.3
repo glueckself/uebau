@@ -1,0 +1,9 @@
+// variable with global scope defined after used as let ident
+foo0 = fun bar0 -> 42 end ;
+foo1 = fun bar3 -> 
+        let foo3 = 42 in 42 end
+end ;
+
+foo2 = fun bar2 -> 42 end ;
+foo3 = fun bar1 -> 42 end ;
+foo4 = fun bar4 -> 42 end ;
