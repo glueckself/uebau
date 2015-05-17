@@ -1,6 +1,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
 
 #include "symbols.h"
 
@@ -87,4 +88,20 @@ symbol_t* mergeLists(symbol_t *list1, symbol_t *list2) {
     }
     
     return list1;
+}
+
+void addSymbolStorage(symbol_t *list, char *name, char *reg) {
+    symbol_t *sym = lookupSymbol(list, name);
+    
+    assert(sym != NULL);
+    
+    sym->regname=reg;
+}
+
+char *getSymbolStorage(symbol_t *list, char *name) {
+    symbol_t *sym = lookupSymbol(list, name);
+    
+    assert(sym != NULL);
+    
+    return sym->regname;
 }

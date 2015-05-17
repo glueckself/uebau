@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "y.tab.h"
 #include "symbols.h"
+#include "asmgen.h"
 %}
 
 DIGITS	[0-9]*

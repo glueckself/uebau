@@ -3,26 +3,50 @@
 
 %}
 
-%term OP_ADD=1 OP_MINUS=2 OP_MULT=3 OP_AND=4 OP_NOT=5 OP_LESS=6 OP_EQUAL=7 OP_ISNUM=8 OP_ISLIST=9 OP_ISFUN=10 OP_DOT=11 OP_HEAD=12 OP_TAIL=13 OP_CALL=14 OP_IDENT=15 OP_NUM=16
+%term OP_PLUS=1 OP_MINUS=2 OP_MULT=3 OP_AND=4 OP_NOT=5 OP_LESS=6 OP_EQUAL=7 OP_ISNUM=8 OP_ISLIST=9 OP_ISFUN=10 OP_DOT=11 OP_HEAD=12 OP_TAIL=13 OP_CALL=14 OP_IDENT=15 OP_NUM=16
 
 %%
 
-fun: OP_CALL(expr)           # 0 #
+fun: OP_CALL(expr)           # 0 # genReturn(kids[0]->regname);
 
-expr: OP_ADD(expr, expr)     # 1 # genAdd(kids[0]->regname, kids[1]->regname);
-expr: OP_MINUS(expr, expr)   # 1 # genMinus(kids[0]->regname, kids[1]->regname);
-expr: OP_MULT(expr, expr)    # 1 # genMult(kids[0]->regname, kids[1]->regname);
-expr: OP_AND(expr, expr)     # 1 # genAnd(kids[0]->regname, kids[1]->regname);
-expr: OP_NOT(expr)           # 1 # genNot(kids[0]->regname);
+expr: OP_PLUS(expr, expr)    # 2 # genAdd(kids[0]->regname, kids[1]->regname);
+expr: OP_PLUS(expr, imm)     # 1 # genAddI(kids[0]->regname, kids[1]->val);
+expr: OP_PLUS(imm, expr)     # 1 # genAddI(kids[1]->regname, kids[0]->val);
+expr: OP_MINUS(expr, expr)   # 2 # genMinus(kids[0]->regname, kids[1]->regname);
+expr: OP_MINUS(expr, imm)    # 1 # genMinusI(kids[0]->regname, kids[1]->val);
+expr: OP_MINUS(imm, expr)    # 1 # genMinusI(kids[1]->regname, kids[0]->val);
+expr: OP_MULT(expr, expr)    # 2 # genMult(kids[0]->regname, kids[1]->regname);
+expr: OP_MULT(expr, imm)     # 1 # genMultI(kids[0]->regname, kids[1]->val);
+expr: OP_MULT(imm, expr)     # 1 # genMultI(kids[1]->regname, kids[0]->val);
+expr: OP_AND(expr, expr)     # 2 # genAnd(kids[0]->regname, kids[1]->regname);
+expr: OP_AND(expr, imm)      # 1 # genAndI(kids[0]->regname, kids[1]->val);
+expr: OP_AND(imm, expr)      # 1 # genAndI(kids[1]->regname, kids[0]->val);
+expr: OP_NOT(expr)           # 2 # genNot(kids[0]->regname);
+expr: OP_NOT(imm)            # 1 # assignFromNum(bnode->regname, kids[0]->val);
 expr: OP_LESS(expr, expr)    # 1 # genLess(kids[0]->regname, kids[1]->regname);
 expr: OP_EQUAL(expr, expr)   # 1 # genEqual(kids[0]->regname, kids[1]->regname);
 expr: OP_ISNUM(expr)         # 1 # genIsNum(kids[0]->regname);
+expr: OP_ISNUM(imm)          # 1 # assignFromNum(bnode->regname, kids[0]->val);
 expr: OP_ISLIST(expr)        # 1 # genIsList(kids[0]->regname);
+expr: OP_ISLIST(imm)         # 1 # assignFromNum(bnode->regname, kids[0]->val);
 expr: OP_ISFUN(expr)         # 1 # genIsFun(kids[0]->regname);
+expr: OP_ISFUN(imm)          # 1 # assignFromNum(bnode->regname, kids[0]->val);
 expr: OP_DOT(expr, expr)     # 1 # genDot(kids[0]->regname, kids[1]->regname);
 expr: OP_HEAD(expr)          # 1 # genHead(kids[0]->regname);
 expr: OP_TAIL(expr)          # 1 # genTail(kids[0]->regname);
 expr: OP_IDENT               # 1 # assignFromIdent(bnode->regname, bnode->ident);
-expr: OP_NUM                 # 1 # assignFromNum(bnode->regname, bnode->value);
+expr: OP_NUM                 # 1 # assignFromNum(bnode->regname, bnode->val);
+
+imm: OP_PLUS(imm, imm)       # 0 # bnode->val = kids[0]->val + kids[1]->val;
+imm: OP_MINUS(imm, imm)      # 0 # bnode->val = kids[0]->val - kids[1]->val;
+imm: OP_MULT(imm, imm)       # 0 # bnode->val = kids[0]->val * kids[1]->val;
+imm: OP_NOT(imm)             # 0 # bnode->val = !bnode->val;
+imm: OP_AND(imm, imm)        # 0 # bnode->val = kids[0]->val & kids[1]->val;
+imm: OP_LESS(imm, imm)       # 0 # bnode->val = (kids[0]->val < kids[1]->val) ? 1 : 0;
+imm: OP_EQUAL(imm, imm)      # 0 # bnode->val = (kids[0]->val == kids[1]->val) ? 1 : 0;
+imm: OP_ISNUM(imm)           # 0 # bnode->val = 1;
+imm: OP_ISFUN(imm)           # 0 # bnode->val = 0;
+imm: OP_ISLIST(imm)          # 0 # bnode->val = 0;
+imm: OP_NUM                  # 0
 
 %%

@@ -1,2 +1,0 @@
-x = fun f -> y f end;
-y = fun f -> f + 1 end;
