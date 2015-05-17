@@ -14,7 +14,7 @@ void genIsFun(const char *dstReg);
 void genDot(const char *dstReg, const char *srcReg);
 void genHead(const char *dstReg);
 void genTail(const char *dstReg);
-void assignFromIdent(bnode->regname, bnode->ident);
-void assignFromNum(bnode->regname, bnode->value);
+void assignFromIdent(const char *reg, long value);
+void assignFromNum(const char *reg, long value);
 
 #endif

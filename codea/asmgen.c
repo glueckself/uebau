@@ -1,4 +1,7 @@
+#include <stdio.h>
+
 #include "asmgen.h"
+
 
 void extractNum(const char *reg) {
 }
@@ -67,10 +70,10 @@ void genHead(const char *dstReg) {
 void genTail(const char *dstReg) {
 }
 
-void assignFromIdent(bnode->regname, bnode->ident) {
+void assignFromIdent(const char *reg, long value) {
 }
 
-void assignFromNum(bnode->regname, bnode->value) {
+void assignFromNum(const char *reg, long value) {
 }
 
 
