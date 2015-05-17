@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include "y.tab.h"
 #include "symbols.h"
+
+#define CODE
 #include "asmgen.h"
 %}
 

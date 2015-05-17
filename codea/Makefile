@@ -1,7 +1,7 @@
 all: codea
 
 codea: asmgen.c parser_iburg.c y.tab.c lex.yy.c symbols.c
-	gcc -o codea $^ -lfl
+	gcc $(DEF) -o codea $^ -lfl
 
 oxout.y oxout.l: parser.y scanner.l symbols.h
 	ox parser.y scanner.l

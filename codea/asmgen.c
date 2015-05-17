@@ -1,5 +1,8 @@
 #include <stdio.h>
 
+#ifndef CODE
+#define CODE
+#endif
 #include "asmgen.h"
 
 const char *regNames[] = {"rax", "rdi", "r11", "r10", "r9", "r8", "rcx", "rdx", "rsi", NULL};

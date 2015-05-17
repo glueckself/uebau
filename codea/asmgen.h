@@ -5,7 +5,9 @@
 #include <stdlib.h>
 #include <assert.h>
 
+#ifdef CODE
 typedef struct burm_state *STATEPTR_TYPE;
+#endif
 
 #define OP_LABEL(p)     	((p)->op)
 #define LEFT_CHILD(p)   	((p)->kids[0])
