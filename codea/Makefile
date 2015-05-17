@@ -1,7 +1,7 @@
-all: ag 
+all: codea
 
-clean:
-	rm -f ag lex.yy.c y.tab.* oxout.*
+codea: asmgen.c parser_iburg.c y.tab.c lex.yy.c symbols.c
+	gcc -o codea $^ -lfl
 
 oxout.y oxout.l: parser.y scanner.l symbols.h
 	ox parser.y scanner.l
@@ -12,5 +12,5 @@ y.tab.c: oxout.y
 lex.yy.c: oxout.l
 	flex oxout.l
 
-ag: lex.yy.c y.tab.c symbols.c symbols.h
-	gcc -o ag lex.yy.c y.tab.c symbols.c -lfl
+parser_iburg.c: asmgen.bfe asmgen.h
+	bfe asmgen.bfe | iburg > parser_iburg.c
