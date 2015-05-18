@@ -4,7 +4,9 @@
 #include <string.h>
 #include "symbols.h"
 
+#ifndef CODE
 #define CODE
+#endif
 #include "asmgen.h"
 %}
 

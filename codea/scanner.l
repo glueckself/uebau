@@ -4,7 +4,9 @@
 #include "y.tab.h"
 #include "symbols.h"
 
+#ifndef CODE
 #define CODE
+#endif
 #include "asmgen.h"
 %}
 

@@ -90,7 +90,7 @@ symbol_t* mergeLists(symbol_t *list1, symbol_t *list2) {
     return list1;
 }
 
-void addSymbolStorage(symbol_t *list, char *name, char *reg) {
+void addSymbolStorage(symbol_t *list, char *name, const char *reg) {
     symbol_t *sym = lookupSymbol(list, name);
     
     assert(sym != NULL);
@@ -98,7 +98,7 @@ void addSymbolStorage(symbol_t *list, char *name, char *reg) {
     sym->regname=reg;
 }
 
-char *getSymbolStorage(symbol_t *list, char *name) {
+const char *getSymbolStorage(symbol_t *list, char *name) {
     symbol_t *sym = lookupSymbol(list, name);
     
     assert(sym != NULL);

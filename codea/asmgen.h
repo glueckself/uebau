@@ -43,8 +43,7 @@ struct _NodeType {
     eOp op;
     STATEPTR_TYPE state;
     int val;
-    char *ident;
-    
+    const char *ident;
     const char *regname;
 };
 
