@@ -7,12 +7,12 @@
 
 %%
 
-fun: OP_CALL(expr)               # 0 # genReturn(kids[0]->regname);
+fun: OP_CALL(expr)                    # 0 # genReturn(kids[0]->regname);
 
-expr: numexpr                    # 1 # tagNum(kids[0]->regname);
-expr: listexpr                   # 1 # tagList(kids[0]->regname);
-expr: OP_HEAD(listexpr)          # 1 # genHead(kids[0]->regname);
-expr: OP_TAIL(listexpr)              # 1 # genTail(kids[0]->regname);
+expr: numexpr                         # 1 # tagNum(kids[0]->regname);
+expr: listexpr                        # 1 # tagList(kids[0]->regname);
+expr: OP_HEAD(listexpr)               # 1 # genHead(kids[0]->regname);
+expr: OP_TAIL(listexpr)               # 1 # genTail(kids[0]->regname);
 expr: OP_IDENT                        # 1 # assignFromIdent(bnode->regname, bnode->ident);
 
 listexpr: expr                        # 2 # extractList(bnode->regname);
