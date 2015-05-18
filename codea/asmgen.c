@@ -5,6 +5,8 @@
 #endif
 #include "asmgen.h"
 
+#define ENABLE_OPT_TYPECHECK 1
+
 const char *regNames[] = {"rax", "rdi", "r11", "r10", "r9", "r8", "rcx", "rdx", "rsi", NULL};
 const int numRegs = (sizeof(regNames)/sizeof(char*)) - 1;
 
@@ -58,34 +60,63 @@ const char *getNextReg(const char *reg) {
     return retval;
 }
 
-
-void extractNum(symbol_t *sym) {
-    if(sym->type == TYPE_NUM)
+static void move(const char *dstReg, const char *srcReg) {
+    if(strcmp(dstReg,srcReg) == 0)
         return;
-    sym->type=TYPE_NUM;
-    
-    printf("sar $1, %%%s\n", sym->regname);
+    printf("mov %%%s, %%%s\n", srcReg, dstReg);
+}
+ 
+static void extractNum(const char *reg) {
+    printf("sar $1, %%%s\n", reg);
     printf("jc raisesig\n");
 }
 
-void tagNum(const char *reg) {
-    printf("sal $1, %%%s\n", reg);
+void genNumFromIdent(const char *regname, symbol_t *sym) {
+#if ENABLE_OPT_TYPECHECK
+    if(sym->type == TYPE_NUM)
+        return;
+    sym->type=TYPE_NUM;
+#endif
+    extractNum(sym->regname);
+    move(regname, sym->regname);
 }
 
-void extractList(symbol_t *sym) {
+void genNumFromReg(const char *dstReg, const char *srcReg) {
+    move(dstReg, srcReg);
+    extractNum(dstReg);
+}
+
+void genTagNum(const char *dstReg, const char *srcReg) {
+    move(dstReg, srcReg);
+    printf("sal $1, %%%s\n", dstReg);
+}
+
+static void extractList(const char *reg) {
+    printf("mov $3, %r12\n");
+    printf("and %%%s, %r12\n", reg);
+    printf("cmp $1, %r12\n");
+    printf("jne raisesig\n");
+    printf("sub $1, %%%s\n", reg);
+}
+
+void genListFromIdent(const char *regname, symbol_t *sym) {
+#if ENABLE_OPT_TYPECHECK
     if(sym->type == TYPE_LIST)
         return;
     sym->type=TYPE_LIST;
-    
-    printf("mov $3, %r12\n");
-    printf("and %%%s, %r12\n", sym->regname);
-    printf("cmp $1, %r12\n");
-    printf("jne raisesig\n");
-    printf("sub $1, %%%s\n", sym->regname);
+#endif
+    extractList(sym->regname);
+    move(regname, sym->regname);
 }
 
-void tagList(const char *reg) {
-    printf("add $1, %%%s\n", reg);
+void genListFromReg(const char *dstReg, const char *srcReg) {
+    move(dstReg, srcReg);
+    extractList(dstReg);
+}
+
+void genTagList(const char *dstReg, const char *srcReg) {
+    move(dstReg, srcReg);
+    printf("add $1, %%%s\n", dstReg);
 }
 
 void genSymbol(const char *fName) {
@@ -96,7 +127,9 @@ void genSymbol(const char *fName) {
     printf("pushq %r12\n");
 }
 
-void genReturn(const char *srcReg) {
+void genReturn(const char *dstReg, const char *srcReg) {
+    if(dstReg != NULL && srcReg != NULL)
+        move(dstReg, srcReg);
     printf("pop %r12\n");
     printf("ret\n\n");
 }
@@ -133,7 +166,7 @@ void genAndI(const char *dstReg, const long value) {
     printf("and $%d, %%%s\n", value, dstReg);
 }
 
-void genNot(const char *dstReg) {
+void genNot(const char *dstReg, const char *srcReg) {
     printf("not %%%s\n", dstReg);
 }
 
@@ -147,43 +180,40 @@ void genEqual(const char *dstReg, const char *srcReg) {
     printf("sete %%%s", dstReg);
 }
 
-void genIsNum(const char *dstReg) {
-    printf("sar $1, %%%s\n", dstReg);
+void genIsNum(const char *dstReg, const char *srcReg) {
+    printf("sar $1, %%%s\n", srcReg);
     printf("setnc %%%s\n", dstReg);
 }
 
-void genIsList(const char *dstReg) {
+void genIsList(const char *dstReg, const char *srcReg) {
     printf("mov $3, %r12\n");
-    printf("and %%%s, %r12\n", dstReg);
+    printf("and %%%s, %r12\n", srcReg);
     printf("cmp $1, %r12\n");
     printf("sete %%%s\n", dstReg);
 }
 
-void genIsFun(const char *dstReg) {
-    printf("test $3, %%%s\n", dstReg);
+void genIsFun(const char *dstReg, const char *srcReg) {
+    printf("test $3, %%%s\n", srcReg);
     printf("sete %%%s\n", dstReg);
 }
 
-const char* genDot(const char *dstReg, const char *srcReg) {
+void genDot(const char *dstReg, const char *srcReg) {
     printf("mov %%%s, 0(%r15)\n", dstReg);
     printf("mov %%%s, 8(%r15)\n", srcReg);
     printf("mov %r15, %%%s\n", dstReg);
     printf("add $16, %r15\n");
-    return dstReg;
 }
 
-void genHead(const char *dstReg) {
-     printf("mov 0(%%%s), %%%s\n", dstReg, dstReg);
+void genHead(const char *dstReg, const char *srcReg) {
+     printf("mov 0(%%%s), %%%s\n", srcReg, dstReg);
 }
 
-void genTail(const char *dstReg) {
-     printf("mov 8(%%%s), %%%s\n", dstReg, dstReg);
+void genTail(const char *dstReg, const char *srcReg) {
+     printf("mov 8(%%%s), %%%s\n", srcReg, dstReg);
 }
 
 void assignFromIdent(const char *dstReg, const char *srcReg ) {
-    if(strcmp(dstReg,srcReg) == 0)
-        return;
-    printf("mov %%%s, %%%s\n", srcReg, dstReg);
+    move(dstReg, srcReg);
 }
 
 void assignFromNum(const char *reg, long value) {

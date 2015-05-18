@@ -1,15 +1,31 @@
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 const char* burm_string[] = {
     "",
 "; fun: OP_CALL(expr)\n",
+
 "; expr: numexpr \n",
 "; expr: listexpr\n",
 "; expr: OP_HEAD(listexpr) \n",
 "; expr: OP_TAIL(listexpr) \n",
-"; expr: OP_IDENT\n",
+
 "; listexpr: expr\n",
 "; listexpr: OP_DOT(expr, expr)\n",
-"; numexpr: expr \n",
+"; listexpr: expr\n",
+
 "; numexpr: OP_ISNUM(expr) \n",
 "; numexpr: OP_ISNUM(numexpr)\n",
 "; numexpr: OP_ISNUM(imm)\n",
@@ -36,6 +52,9 @@ const char* burm_string[] = {
 "; numexpr: OP_LESS(numexpr, numexpr)\n",
 "; numexpr: OP_EQUAL(expr, expr) \n",
 "; numexpr: OP_NUM \n",
+"; numexpr: OP_IDENT \n",
+"; numexpr: expr \n",
+
 "; imm: OP_PLUS(imm, imm) \n",
 "; imm: OP_MINUS(imm, imm)\n",
 "; imm: OP_MULT(imm, imm) \n",

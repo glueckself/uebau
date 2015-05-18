@@ -54,30 +54,31 @@ NODEPTR_TYPE newNumNode(int value);
 NODEPTR_TYPE newIdentNode(symbol_t *ident);
 const char* getNextReg(const char *reg);    
 
+void genNumFromIdent(const char *regname, symbol_t *sym);
+void genNumFromReg(const char *dstReg, const char *srcReg);
+void genTagNum(const char *dstReg, const char *srcReg);
+void genListFromIdent(const char *regname, symbol_t *sym);
+void genListFromReg(const char *dstReg, const char *srcReg);
+void tagList(const char *dstReg, const char *srcReg);
 void genSymbol(const char *fName);
-void genReturn(const char *srcReg);
-
+void genReturn(const char *destReg, const char *srcReg);
 void genAdd(const char *dstReg, const char *srcReg);
 void genAddI(const char *dstReg, const long value);
-
 void genMinus(const char *dstReg, const char *srcReg);
 void genMinusI(const char *dstReg, const long value);
-
 void genMult(const char *dstReg, const char *srcReg);
-void genMultI(const char *dstReg, const long value) ;
-
+void genMultI(const char *dstReg, const long value);
 void genAnd(const char *dstReg, const char *srcReg);
 void genAndI(const char *dstReg, const long value);
-
-void genNot(const char *dstReg);
+void genNot(const char *dstReg, const char *srcReg);
 void genLess(const char *dstReg, const char *srcReg);
 void genEqual(const char *dstReg, const char *srcReg);
-void genIsNum(const char *dstReg);
-void genIsList(const char *dstReg);
-void genIsFun(const char *dstReg);
-const char* genDot(const char *dstReg, const char *srcReg);
-void genHead(const char *dstReg);
-void genTail(const char *dstReg);
+void genIsNum(const char *dstReg, const char *srcReg);
+void genIsList(const char *dstReg, const char *srcReg);
+void genIsFun(const char *dstReg, const char *srcReg);
+void genDot(const char *dstReg, const char *srcReg);
+void genHead(const char *dstReg, const char *srcReg);
+void genTail(const char *dstReg, const char *srcReg);
 void assignFromIdent(const char *dstReg, const char *srcReg );
 void assignFromNum(const char *reg, long value);
 
