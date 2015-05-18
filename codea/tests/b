@@ -1,0 +1,4 @@
+b = fun x -> x.x end;
+b1 = fun x -> x.x.x end;
+b2 = fun x -> x.4.x end;
+b3 = fun x -> x.4.(x+1).5 end;

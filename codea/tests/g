@@ -1,0 +1,5 @@
+g = fun x -> head (0.1.2.3.4) end;
+g1 = fun x -> head x end;
+g2 = fun x -> head (x.1) end;
+g3 = fun x -> tail x end;
+g4 = fun x -> tail (x.2) end;

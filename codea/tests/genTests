@@ -1,0 +1,33 @@
+#!/bin/bash
+
+INFILE="$1"
+OUTDIR="$2"
+INNAME=$(basename "$INFILE")
+
+if [[ "$OUTDIR" == "" ]]; then
+    echo "usage: genTests <input file> <output directory>"
+    exit
+fi
+
+testId=0
+testcode=""
+while read line; do
+    if [[ "$line" == %%* ]]; then
+        if [[ "$testId" == 0 ]]; then
+            testcode=$input
+        else
+            echo -e "$testcode" > "${OUTDIR}/${INNAME}${testId}.${ext}"
+            echo -e "$input" > "${OUTDIR}/${INNAME}${testId}.call"
+        fi
+        
+        ext=${line##*.}
+        input=""
+        testId=$(($testId+1))
+        continue
+    fi
+    
+    input="$input\n$line"
+done < "$INFILE"
+
+echo -e "$testcode" > "${OUTDIR}/${INNAME}${testId}.${ext}"
+echo -e "$input" > "${OUTDIR}/${INNAME}${testId}.call"

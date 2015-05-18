@@ -1,8 +1,0 @@
-x = fun f -> f.f end;
-x1 = fun f -> f.f.f end;
-x2 = fun f -> f.4.f end;
-y = fun f -> f+3 end;
-y1 = fun f -> f+f+f end;
-y2 = fun f -> f+3+4 end;
-y3 = fun f -> f+3+f end;
-y4 = fun f -> 3+4+f end;

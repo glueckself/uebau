@@ -1,0 +1,5 @@
+f = fun x -> isnum x end;
+f1 = fun x -> isnum 5 end;
+f2 = fun x -> islist x end;
+f3 = fun x -> islist (0.0) end;
+f4 = fun x -> isfun 3 end;

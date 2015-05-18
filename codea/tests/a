@@ -1,0 +1,22 @@
+a = fun x -> x+3 end;
+a1 = fun x -> x+x+x end;
+a2 = fun x -> x+3+4 end;
+a3 = fun x -> x+3+x end;
+a4 = fun x -> 3+4+x end;
+
+%%.0
+RET (
+    a(1) == 4 &&
+    a(2) == 5 &&
+    a1(2) == 6 &&
+    a1(3) == 9 &&
+    a2(3) == 10 &&
+    a3(3) == 9 &&
+    a4(10) == 17
+);
+
+%%.xin
+RET(a(0|1));
+
+%%.xin
+RET(a1(0|1));
