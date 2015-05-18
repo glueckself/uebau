@@ -2,3 +2,23 @@ b = fun x -> x.x end;
 b1 = fun x -> x.x.x end;
 b2 = fun x -> x.4.x end;
 b3 = fun x -> x.4.(x+1).5 end;
+
+%%.0
+const sListElem list[] = {
+    {.type = ELEM_NUM, .data.value=TAG_NUM(5)},
+    {.type = ELEM_NUM, .data.value=TAG_NUM(5)},
+    {.type = ELEM.END}
+};
+
+RET(LIST_EQUAL(b(5), list));
+
+%%.0
+const sListElem list[] = {
+    {.type = ELEM_NUM, .data.value=TAG_NUM(5)},
+    {.type = ELEM_NUM, .data.value=TAG_NUM(4)},
+    {.type = ELEM_NUM, .data.value=TAG_NUM(5)},
+    {.type = ELEM.END}
+};
+
+RET(LIST_EQUAL(b2(5), list));
+    
