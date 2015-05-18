@@ -143,7 +143,10 @@ void genIsFun(const char *dstReg) {
 }
 
 const char* genDot(const char *dstReg, const char *srcReg) {
-
+    printf("mov %%%s, 0(%r15)\n", dstReg);
+    printf("mov %%%s, 8(%r15)\n", srcReg);
+    printf("mov %r15, %%%s\n", dstReg);
+    printf("add $16, %r15\n");
     return dstReg;
 }
 

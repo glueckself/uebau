@@ -16,8 +16,7 @@ expr: OP_TAIL(listexpr)               # 1 # genTail(kids[0]->regname);
 expr: OP_IDENT                        # 1 # assignFromIdent(bnode->regname, bnode->ident);
 
 listexpr: expr                        # 2 # extractList(bnode->regname);
-listexpr: OP_DOT(expr, expr)          # 1 # genDot(kids[0]->regname, genDot(kids[1]->regname, NULL));
-listexpr: OP_DOT(expr, listexpr)      # 1 # genDot(kids[0]->regname, kids[1]->regname);
+listexpr: OP_DOT(expr, expr)          # 1 # genDot(kids[0]->regname, kids[1]->regname);
 
 numexpr: expr                         # 2 # extractNum(bnode->regname);
 numexpr: OP_ISNUM(expr)               # 2 # genIsNum(kids[0]->regname);
