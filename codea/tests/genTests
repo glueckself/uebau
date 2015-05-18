@@ -17,7 +17,7 @@ while read line; do
             testcode=$input
         else
             echo -e "$testcode" > "${OUTDIR}/${INNAME}${testId}.${ext}"
-            echo -e "$input" > "${OUTDIR}/${INNAME}${testId}.call"
+            echo -e "#include \"helper.h\"\n$input" > "${OUTDIR}/${INNAME}${testId}.call"
         fi
         
         ext=${line##*.}
@@ -30,4 +30,4 @@ while read line; do
 done < "$INFILE"
 
 echo -e "$testcode" > "${OUTDIR}/${INNAME}${testId}.${ext}"
-echo -e "$input" > "${OUTDIR}/${INNAME}${testId}.call"
+echo -e "#include \"helper.h\"\n$input" > "${OUTDIR}/${INNAME}${testId}.call"

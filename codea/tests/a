@@ -5,21 +5,29 @@ a3 = fun x -> x+3+x end;
 a4 = fun x -> 3+4+x end;
 
 %%.0
-#include "helper.h"
-RET (
-    a(TAG_NUM(1)) == TAG_NUM(4) &&
-    a(TAG_NUM(2)) == TAG_NUM(5) &&
-    a1(TAG_NUM(2)) == TAG_NUM(6) &&
-    a1(TAG_NUM(3)) == TAG_NUM(9) &&
-    a2(TAG_NUM(3)) == TAG_NUM(10) &&
-    a3(TAG_NUM(3)) == TAG_NUM(9) &&
-    a4(TAG_NUM(10)) == TAG_NUM(17)
-);
+RET (a(TAG_NUM(1)) == TAG_NUM(4));
+
+%%.0
+RET(a(TAG_NUM(2)) == TAG_NUM(5));
+
+%%.0
+RET(a1(TAG_NUM(2)) == TAG_NUM(6));
+
+%%.0
+RET(a1(TAG_NUM(3)) == TAG_NUM(9));
+
+%%.0
+RET(a2(TAG_NUM(3)) == TAG_NUM(10));
+
+%%.0
+RET(a3(TAG_NUM(3)) == TAG_NUM(9));
+
+%%.0
+RET(a4(TAG_NUM(10)) == TAG_NUM(17));
 
 %%.xin
-#include "helper.h"
 RET(a(TAG_LIST(0)));
 
 %%.xin
-#include "helper.h"
 RET(a1(TAG_LIST(1)));
+
