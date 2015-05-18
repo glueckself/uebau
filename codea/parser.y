@@ -228,7 +228,7 @@ DotTerm: Term DOT Term @{
           @reg @Term.0.node@->regname = @DotTerm.node@->regname;
           @reg @Term.1.node@->regname = getNextReg(@DotTerm.node@->regname);
          @}
-       | Term DOT DotTerm @{
+       | DotTerm DOT Term @{
             @i @DotTerm.0.node@ = newNode(OP_DOT, @Term.node@, @DotTerm.1.node@);
             
             @reg @DotTerm.1.node@->regname = @DotTerm.0.node@->regname;

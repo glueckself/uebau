@@ -6,7 +6,8 @@
 
 /*
 
-expr: OP_IDENT                        # 1 # assignFromIdent(bnode->regname, bnode->ident->regname);
+listexpr: OP_IDENT                    # 1 # genListFromIdent(bnode->regname, bnode->ident);
+numexpr: OP_NUM                       # 1 # assignFromNum(bnode->regname, bnode->val);
 */
 %}
 
@@ -23,7 +24,14 @@ expr: OP_TAIL(listexpr)               # 1 # genTail(bnode->regname, kids[0]->reg
 expr: OP_IDENT                        # 1 # assignFromIdent(bnode->regname, bnode->ident->regname);
 
 listexpr: OP_DOT(expr, expr)          # 1 # genDot(bnode->regname, kids[0]->regname, kids[1]->regname);
-listexpr: OP_IDENT                    # 1 # genListFromIdent(bnode->regname, bnode->ident);
+listexpr: OP_DOT(expr, listexpr)      # 1 # genDot(bnode->regname, kids[0]->regname, kids[1]->regname);
+listexpr: OP_DOT(expr, numeexpr)      # 1 # genDot(bnode->regname, kids[0]->regname, kids[1]->regname);
+listexpr: OP_DOT(numexpr, expr)       # 1 # genDot(bnode->regname, kids[0]->regname, kids[1]->regname);
+listexpr: OP_DOT(numexpr, listexpr)   # 1 # genDot(bnode->regname, kids[0]->regname, kids[1]->regname);
+listexpr: OP_DOT(numexpr, numexpr)    # 1 # genDot(bnode->regname, kids[0]->regname, kids[1]->regname);
+listexpr: OP_DOT(listexpr,expr)       # 1 # genDot(bnode->regname, kids[0]->regname, kids[1]->regname);
+listexpr: OP_DOT(listexpr,numexpr)    # 1 # genDot(bnode->regname, kids[0]->regname, kids[1]->regname);
+listexpr: OP_DOT(listexpr,listexpr)   # 1 # genDot(bnode->regname, kids[0]->regname, kids[1]->regname);
 listexpr: expr                        # 1 # genListFromReg(bnode->regname, kids[0]->regname);
 
 numexpr: OP_ISNUM(expr)               # 2 # genIsNum(bnode->regname, kids[0]->regname);
@@ -51,10 +59,9 @@ numexpr: OP_NOT(numexpr)              # 2 # genNot(bnode->regname, kids[0]->regn
 numexpr: OP_NOT(imm)                  # 1 # assignFromNum(bnode->regname, kids[0]->val);
 numexpr: OP_LESS(numexpr, numexpr)    # 1 # genLess(bnode->regname,kids[0]->regname, kids[1]->regname);
 numexpr: OP_EQUAL(expr, expr)         # 1 # genEqual(bnode->regname,kids[0]->regname, kids[1]->regname);
-numexpr: OP_NUM                       # 1 # assignFromNum(bnode->regname, bnode->val);
 numexpr: OP_IDENT                     # 1 # genNumFromIdent(bnode->regname, bnode->ident);
 numexpr: expr                         # 1 # genNumFromReg(bnode->regname, kids[0]->regname);
-numexpr: imm                          # 1 # bnode->val = kids[0]->val;
+numexpr: imm                          # 1 # assignFromNum(bnode->regname, kids[0]->val);
 
 imm: OP_PLUS(imm, imm)       # 0 # bnode->val = kids[0]->val + kids[1]->val;
 imm: OP_MINUS(imm, imm)      # 0 # bnode->val = kids[0]->val - kids[1]->val;

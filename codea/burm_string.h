@@ -14,17 +14,25 @@
 
 
 const char* burm_string[] = {
-    "",
+"",
 "; fun: OP_CALL(expr)\n",
 
 "; expr: numexpr \n",
 "; expr: listexpr\n",
 "; expr: OP_HEAD(listexpr) \n",
 "; expr: OP_TAIL(listexpr) \n",
-"; expr: OP_IDENT          \n",
+"; expr: OP_IDENT\n",
 
-"; listexpr: expr\n",
-"; listexpr: OP_DOT(expr, expr)\n",
+";listexpr: OP_DOT(expr, expr)\n",
+";listexpr: OP_DOT(expr, listexpr)\n",
+";listexpr: OP_DOT(expr, numeexpr)\n",
+";listexpr: OP_DOT(numexpr, expr) \n",
+";listexpr: OP_DOT(numexpr, listexpr) \n",
+";listexpr: OP_DOT(numexpr, numexpr)\n",
+";listexpr: OP_DOT(listexpr,expr) \n",
+";listexpr: OP_DOT(listexpr,numexpr)\n",
+";listexpr: OP_DOT(listexpr,listexpr) \n",
+//";listexpr: OP_IDENT\n",
 "; listexpr: expr\n",
 
 "; numexpr: OP_ISNUM(expr) \n",
@@ -52,7 +60,7 @@ const char* burm_string[] = {
 "; numexpr: OP_NOT(imm)\n",
 "; numexpr: OP_LESS(numexpr, numexpr)\n",
 "; numexpr: OP_EQUAL(expr, expr) \n",
-"; numexpr: OP_NUM \n",
+//"; numexpr: OP_NUM \n",
 "; numexpr: OP_IDENT \n",
 "; numexpr: expr \n",
 "; numexpr: imm \n",

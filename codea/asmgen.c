@@ -42,8 +42,10 @@ const char *getNextReg(const char *reg) {
     int i;
     const char *retval;
     
-    if(reg == NULL)
+    if(reg == NULL) {
+        printf("; returning start %rax\n");
         return regNames[0];
+    }
     
     for(i=0; i<numRegs; i++) {
         if(strcmp(reg,regNames[i]))
@@ -57,6 +59,7 @@ const char *getNextReg(const char *reg) {
         exit(4);
     }
     
+    printf("; returning reg: %s\n", retval);
     return retval;
 }
 
