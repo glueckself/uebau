@@ -81,7 +81,7 @@ void tagList(const char *reg) {
 }
 
 void genSymbol(const char *fName) {
-    printf(".text\n");
+    printf("\n.text\n");
     printf(".globl %s\n", fName);
     printf("\t.type %s, @function\n", fName);
     printf("%s:\n",fName);
@@ -96,39 +96,39 @@ void genReturn(const char *srcReg) {
 }
 
 void genAdd(const char *dstReg, const char *srcReg) {
-            printf("add %%%s, %%%s\n", srcReg, dstReg);
+    printf("add %%%s, %%%s\n", srcReg, dstReg);
 }
 
 void genAddI(const char *dstReg, const long value) {
-        printf("add $%d, %%%s\n", value, dstReg);
+    printf("add $%d, %%%s\n", value, dstReg);
 }
 
 void genMinus(const char *dstReg, const char *srcReg) {
-            printf("sub %%%s, %%%s\n", srcReg, dstReg);
+    printf("sub %%%s, %%%s\n", srcReg, dstReg);
 }
 
 void genMinusI(const char *dstReg, const long value) {
-        printf("sub $%d, %%%s\n", value, dstReg);
+    printf("sub $%d, %%%s\n", value, dstReg);
 }
     
 void genMult(const char *dstReg, const char *srcReg) {
-            printf("imul %%%s, %%%s\n", srcReg, dstReg);
+    printf("imul %%%s, %%%s\n", srcReg, dstReg);
 }
 
 void genMultI(const char *dstReg, const long value) {
-        printf("imul $%d, %%%s\n", value, dstReg);
+    printf("imul $%d, %%%s\n", value, dstReg);
 }
 
 void genAnd(const char *dstReg, const char *srcReg) {
-            printf("and %%%s, %%%s\n", srcReg, dstReg);
+    printf("and %%%s, %%%s\n", srcReg, dstReg);
 }
 
 void genAndI(const char *dstReg, const long value) {
-        printf("and $%d, %%%s\n", value, dstReg);
+    printf("and $%d, %%%s\n", value, dstReg);
 }
 
 void genNot(const char *dstReg) {
-        printf("neg %%%s\n", dstReg);
+    printf("not %%%s\n", dstReg);
 }
 
 void genLess(const char *dstReg, const char *srcReg) {
