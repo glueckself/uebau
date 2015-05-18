@@ -7,9 +7,8 @@ typedef enum {
 typedef struct {
 	eListElemType type;
 	
-        void *next;
-        long value;
-    
+        long head;
+        long tail;
 } sListElem;
 
 #define GET_PAYLOAD(dst, src) do {		\
@@ -28,8 +27,8 @@ typedef struct {
 #define IS_LIST(n) (((long)(n) & 3) == 1)
 #define IS_FUN(n) (((long)(n) & 3) == 3)
 
-#define LIST_HEAD(l) ( *((long*)l) )
-#define LIST_TAIL(l) ( *( ((long*)l)+1 ) )
+#define LIST_HEAD(l) ( ((long*)l)[0] )
+#define LIST_TAIL(l) ( ((long*)l)[1] )
 	
 #define LIST_EQUAL(list1, list2) do {   	\
     int i;                                      \
@@ -46,11 +45,15 @@ typedef struct {
         }                                       \
         l1=UNTAG_LIST(l1);                      \
         val=LIST_HEAD(l1);                      \
-        if(val != l2[i].value) {                \
-            printf("value mismatch: %d/%d\n", val, l2[i].value); \
+        if(val != l2[i].head) {                 \
+            printf("head mismatch: %d/%d\n", val, l2[i].head); \
             return 0;                           \
         }                                       \
         l1=LIST_TAIL(l1);                       \
+        if(l2[i].tail && (l2[i].tail != l1)) {  \
+            printf("tail mismatch: %d/%d\n", l1, l2[i].tail); \
+            return 0;                           \
+        }                                       \
     }                                           \
     return 1;                                   \
 } while(0)
