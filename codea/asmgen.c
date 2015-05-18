@@ -134,49 +134,58 @@ void genReturn(const char *dstReg, const char *srcReg) {
     printf("ret\n\n");
 }
 
-void genAdd(const char *dstReg, const char *srcReg) {
-    printf("add %%%s, %%%s\n", srcReg, dstReg);
+void genAdd(const char *dstReg, const char *srcReg1, const char *srcReg2) {
+    printf("add %%%s, %%%s\n", srcReg2, srcReg1);
+    move(dstReg, srcReg1);
 }
 
-void genAddI(const char *dstReg, const long value) {
+void genAddI(const char *dstReg, const char *srcReg, const long value) {
+    move(dstReg, srcReg);
     printf("add $%d, %%%s\n", value, dstReg);
 }
 
-void genMinus(const char *dstReg, const char *srcReg) {
-    printf("sub %%%s, %%%s\n", srcReg, dstReg);
+void genMinus(const char *dstReg, const char *srcReg1, const char *srcReg2) {
+    printf("sub %%%s, %%%s\n", srcReg2, srcReg1);
+    move(dstReg, srcReg1);
 }
 
-void genMinusI(const char *dstReg, const long value) {
+void genMinusI(const char *dstReg, const char *srcReg, const long value) {
+    move(dstReg, srcReg);
     printf("sub $%d, %%%s\n", value, dstReg);
 }
     
-void genMult(const char *dstReg, const char *srcReg) {
-    printf("imul %%%s, %%%s\n", srcReg, dstReg);
+void genMult(const char *dstReg, const char *srcReg1, const char *srcReg2) {
+    printf("imul %%%s, %%%s\n", srcReg2, srcReg1);
+    move(dstReg, srcReg1);
 }
 
-void genMultI(const char *dstReg, const long value) {
+void genMultI(const char *dstReg, const char *srcReg, const long value) {
+    move(dstReg, srcReg);
     printf("imul $%d, %%%s\n", value, dstReg);
 }
 
-void genAnd(const char *dstReg, const char *srcReg) {
-    printf("and %%%s, %%%s\n", srcReg, dstReg);
+void genAnd(const char *dstReg, const char *srcReg1, const char *srcReg2) {
+    printf("and %%%s, %%%s\n", srcReg2, srcReg1);
+    move(dstReg, srcReg1);
 }
 
-void genAndI(const char *dstReg, const long value) {
+void genAndI(const char *dstReg, const char *srcReg, const long value) {
+    move(dstReg, srcReg);
     printf("and $%d, %%%s\n", value, dstReg);
 }
 
 void genNot(const char *dstReg, const char *srcReg) {
+    move(dstReg, srcReg);
     printf("not %%%s\n", dstReg);
 }
 
-void genLess(const char *dstReg, const char *srcReg) {
-    printf("cmp %%%s, %%%s\n", srcReg, dstReg);
+void genLess(const char *dstReg, const char *srcReg1, const char *srcReg2) {
+    printf("cmp %%%s, %%%s\n", srcReg1, srcReg2);
     printf("setb %%%s\n", dstReg);
 }
 
-void genEqual(const char *dstReg, const char *srcReg) {
-    printf("cmp %%%s, %%%s\n", srcReg, dstReg);
+void genEqual(const char *dstReg, const char *srcReg1, const char *srcReg2) {
+    printf("cmp %%%s, %%%s\n", srcReg1, srcReg2);
     printf("sete %%%s", dstReg);
 }
 
@@ -197,9 +206,9 @@ void genIsFun(const char *dstReg, const char *srcReg) {
     printf("sete %%%s\n", dstReg);
 }
 
-void genDot(const char *dstReg, const char *srcReg) {
-    printf("mov %%%s, 0(%r15)\n", dstReg);
-    printf("mov %%%s, 8(%r15)\n", srcReg);
+void genDot(const char *dstReg, const char *srcReg, const char *srcReg2) {
+    printf("mov %%%s, 0(%r15)\n", srcReg);
+    printf("mov %%%s, 8(%r15)\n", srcReg2);
     printf("mov %r15, %%%s\n", dstReg);
     printf("add $16, %r15\n");
 }

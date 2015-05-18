@@ -55,6 +55,7 @@ const char* burm_string[] = {
 "; numexpr: OP_NUM \n",
 "; numexpr: OP_IDENT \n",
 "; numexpr: expr \n",
+"; numexpr: imm \n",
 
 "; imm: OP_PLUS(imm, imm) \n",
 "; imm: OP_MINUS(imm, imm)\n",
