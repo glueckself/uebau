@@ -76,7 +76,7 @@ Def: IDENT EQUAL Lambda @{
         
         @t checkGlobalSymbol(@Def.globSym@, @IDENT.val@);
         
-        @reg @Lambda.node@->regname = "rax";
+        @reg @Lambda.node@->regname = getNextReg(NULL);
         
         @codegen genSymbol(@IDENT.val@);
         @codegen burm_label(@Def.node@); burm_reduce(@Def.node@, 1);
