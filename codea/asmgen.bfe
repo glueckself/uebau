@@ -43,7 +43,7 @@ numexpr: OP_AND(imm, numexpr)         # 1 # genAndI(kids[1]->regname, kids[0]->v
 numexpr: OP_NOT(numexpr)              # 2 # genNot(kids[0]->regname);
 numexpr: OP_NOT(imm)                  # 1 # assignFromNum(bnode->regname, kids[0]->val);
 numexpr: OP_LESS(numexpr, numexpr)    # 1 # genLess(kids[0]->regname, kids[1]->regname);
-numexpr: OP_EQUAL(numexpr, numexpr)   # 1 # genEqual(kids[0]->regname, kids[1]->regname);
+numexpr: OP_EQUAL(expr, expr)         # 1 # genEqual(kids[0]->regname, kids[1]->regname);
 numexpr: OP_NUM                       # 1 # assignFromNum(bnode->regname, bnode->val);
 
 imm: OP_PLUS(imm, imm)       # 0 # bnode->val = kids[0]->val + kids[1]->val;
