@@ -3,6 +3,7 @@ a1 = fun x -> x+x+x end;
 a2 = fun x -> x+3+4 end;
 a3 = fun x -> x+3+x end;
 a4 = fun x -> 3+4+x end;
+a5 = fun x -> (x+3)*2 end;
 
 %%.0
 RET (a(TAG_NUM(1)) == TAG_NUM(4));
@@ -30,4 +31,7 @@ RET(a(TAG_LIST(0)));
 
 %%.xin
 RET(a1(TAG_LIST(1)));
+
+%%.0
+RET(a5(TAG_NUM(2)) == TAG_NUM(10));
 
