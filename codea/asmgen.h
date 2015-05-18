@@ -74,7 +74,7 @@ void genEqual(const char *dstReg, const char *srcReg);
 void genIsNum(const char *dstReg);
 void genIsList(const char *dstReg);
 void genIsFun(const char *dstReg);
-void genDot(const char *dstReg, const char *srcReg);
+const char* genDot(const char *dstReg, const char *srcReg);
 void genHead(const char *dstReg);
 void genTail(const char *dstReg);
 void assignFromIdent(const char *dstReg, const char *srcReg );

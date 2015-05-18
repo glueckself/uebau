@@ -144,8 +144,9 @@ void genIsList(const char *dstReg) {
 void genIsFun(const char *dstReg) {
 }
 
-void genDot(const char *dstReg, const char *srcReg) {
+const char* genDot(const char *dstReg, const char *srcReg) {
 
+    return dstReg;
 }
 
 void genHead(const char *dstReg) {
