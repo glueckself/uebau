@@ -87,7 +87,7 @@ void genSymbol(const char *fName) {
 }
 
 void genReturn(const char *srcReg) {
-    printf("ret");
+    printf("ret\n");
 }
 
 void genAdd(const char *dstReg, const char *srcReg) {
@@ -156,6 +156,8 @@ void genTail(const char *dstReg) {
 }
 
 void assignFromIdent(const char *dstReg, const char *srcReg ) {
+    if(strcmp(dstReg,srcReg) == 0)
+        return;
     printf("mov %%%s, %%%s\n", srcReg, dstReg);
 }
 
