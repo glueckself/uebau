@@ -85,13 +85,11 @@ void genSymbol(const char *fName) {
     printf(".globl %s\n", fName);
     printf("\t.type %s, @function\n", fName);
     printf("%s:\n",fName);
-    printf("enter\n");
     printf("pushq %r12\n");
 }
 
 void genReturn(const char *srcReg) {
     printf("pop %r12\n");
-    printf("leave\n");
     printf("ret\n\n");
 }
 
