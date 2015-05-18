@@ -10,17 +10,16 @@
 %%
 
 fun: OP_CALL(expr)                    # 0 # genReturn(kids[0]->regname);
-
 expr: numexpr                         # 1 # tagNum(kids[0]->regname);
 expr: listexpr                        # 1 # tagList(kids[0]->regname);
 expr: OP_HEAD(listexpr)               # 1 # genHead(kids[0]->regname);
 expr: OP_TAIL(listexpr)               # 1 # genTail(kids[0]->regname);
-expr: OP_IDENT                        # 1 # assignFromIdent(bnode->regname, bnode->ident);
+expr: OP_IDENT                        # 1 # assignFromIdent(bnode->regname, bnode->ident->regname);
 
-listexpr: expr                        # 2 # extractList(bnode->regname);
+listexpr: expr                        # 2 # extractList(bnode->ident);
 listexpr: OP_DOT(expr, expr)          # 1 # genDot(kids[0]->regname, kids[1]->regname);
 
-numexpr: expr                         # 2 # extractNum(bnode->regname);
+numexpr: expr                         # 2 # extractNum(bnode->ident);
 numexpr: OP_ISNUM(expr)               # 2 # genIsNum(kids[0]->regname);
 numexpr: OP_ISNUM(numexpr)            # 1 # assignFromNum(bnode->regname, 1);
 numexpr: OP_ISNUM(imm)                # 1 # assignFromNum(bnode->regname, kids[0]->val);

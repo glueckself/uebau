@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <assert.h>
 
+#include "symbols.h"
+
 #ifdef CODE
 typedef struct burm_state *STATEPTR_TYPE;
 #endif
@@ -43,13 +45,13 @@ struct _NodeType {
     eOp op;
     STATEPTR_TYPE state;
     int val;
-    const char *ident;
+    symbol_t *ident;
     const char *regname;
 };
 
 NODEPTR_TYPE newNode(eOp op, NODEPTR_TYPE left, NODEPTR_TYPE right);
 NODEPTR_TYPE newNumNode(int value);
-NODEPTR_TYPE newIdentNode(char *storage);
+NODEPTR_TYPE newIdentNode(symbol_t *ident);
 const char* getNextReg(const char *reg);    
 
 void genSymbol(const char *fName);

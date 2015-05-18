@@ -27,11 +27,11 @@ NODEPTR_TYPE newNumNode(int value) {
     return node;
 }
 
-NODEPTR_TYPE newIdentNode(char *storage) {
+NODEPTR_TYPE newIdentNode(symbol_t *ident) {
     NODEPTR_TYPE node = calloc(1, sizeof(NODE_TYPE));
     
     node->op = OP_IDENT;
-    node->regname=storage;
+    node->ident=ident;
     
     return node;
 }
@@ -59,8 +59,12 @@ const char *getNextReg(const char *reg) {
 }
 
 
-void extractNum(const char *reg) {
-    printf("sar $1, %%%s\n", reg);
+void extractNum(symbol_t *sym) {
+    if(sym->type == TYPE_NUM)
+        return;
+    sym->type=TYPE_NUM;
+    
+    printf("sar $1, %%%s\n", sym->regname);
     printf("jc raisesig\n");
 }
 
@@ -68,12 +72,16 @@ void tagNum(const char *reg) {
     printf("sal $1, %%%s\n", reg);
 }
 
-void extractList(const char *reg) {
+void extractList(symbol_t *sym) {
+    if(sym->type == TYPE_LIST)
+        return;
+    sym->type=TYPE_LIST;
+    
     printf("mov $3, %r12\n");
-    printf("and %%%s, %r12\n", reg);
+    printf("and %%%s, %r12\n", sym->regname);
     printf("cmp $1, %r12\n");
     printf("jne raisesig\n");
-    printf("sub $1, %%%s\n", reg);
+    printf("sub $1, %%%s\n", sym->regname);
 }
 
 void tagList(const char *reg) {

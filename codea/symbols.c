@@ -10,6 +10,7 @@ static symbol_t* mkElement(char *name) {
     
     item = (symbol_t*)calloc(1,sizeof(symbol_t));
     item->name = name;
+    item->type = TYPE_UNKNOWN;
     
     return item;
 }
@@ -96,12 +97,4 @@ void addSymbolStorage(symbol_t *list, char *name, const char *reg) {
     assert(sym != NULL);
     
     sym->regname=reg;
-}
-
-const char *getSymbolStorage(symbol_t *list, char *name) {
-    symbol_t *sym = lookupSymbol(list, name);
-    
-    assert(sym != NULL);
-    
-    return sym->regname;
 }
