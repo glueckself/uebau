@@ -14,7 +14,7 @@ typedef struct {
 #define GET_PAYLOAD(dst, src) do {		\
 	if((src)->type == ELEM_NUM)		\
 		(long)(dst) = (src)->data.value;\
-	else
+	else                                    \
 		(long)(dst) = (src)->data.next;	\
 } while(0);
 

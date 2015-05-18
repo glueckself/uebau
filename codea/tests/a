@@ -7,7 +7,7 @@ a4 = fun x -> 3+4+x end;
 %%.0
 #include "helper.h"
 RET (
-    a(TAG_NUM(1)) == TAG_NUM(TAG_NUM(4) &&
+    a(TAG_NUM(1)) == TAG_NUM(4) &&
     a(TAG_NUM(2)) == TAG_NUM(5) &&
     a1(TAG_NUM(2)) == TAG_NUM(6) &&
     a1(TAG_NUM(3)) == TAG_NUM(9) &&
