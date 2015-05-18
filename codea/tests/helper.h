@@ -19,29 +19,36 @@ typedef struct {
 		(long)(dst) = (src)->next;	\
 } while(0);
 
-#define TAG_LIST(l) ((l) | 1)
-#define UNTAG_LIST(l) ((l)-1)
+#define TAG_LIST(l) ((void*)((long)(l) | 1))
+#define UNTAG_LIST(l) ((void*)((long)(l)-1))
 #define TAG_NUM(n) ((n)<<1)
 #define UNTAG_NUM(n) ((n)>>1)
 
-#define IS_NUM(n) (((n) & 1) == 0)
-#define IS_LIST(n) (((n) & 3) == 1)
-#define IS_FUN(n) (((n) & 3) == 3)
+#define IS_NUM(n) (((long)(n) & 1) == 0)
+#define IS_LIST(n) (((long)(n) & 3) == 1)
+#define IS_FUN(n) (((long)(n) & 3) == 3)
 
 #define LIST_HEAD(l) ( *((long*)l) )
 #define LIST_TAIL(l) ( *( ((long*)l)+1 ) )
 	
 #define LIST_EQUAL(list1, list2) do {   	\
     int i;                                      \
-    void *l1, *l2;                              \
+    long val;                                   \
+    void *l1;                                   \
+    sListElem *l2;                              \
     l1=(list1);                                 \
     l2=(list2);                                 \
     for(i=0; l2[i].type != ELEM_END; i++) {     \
-        if(!IS_LIST(l1))                        \
+        if(!IS_LIST(l1)) {                      \
+            printf("not a list: %x", (long)l1); \
             return 0;                           \
+        }                                       \
         l1=UNTAG_LIST(l1);                      \
-        if(LIST_HEAD(l1) != l2[i].value)        \
+        val=LIST_HEAD(l1);                      \
+        if(val != l2[i].value) {                \
+            printf("value mismatch: %d/%d", val, l2[i].value); \
             return 0;                           \
+        }                                       \
         l1=LIST_TAIL(l1);                       \
     }                                           \
     return 1;                                   \
