@@ -21,6 +21,7 @@ const char* burm_string[] = {
 "; expr: listexpr\n",
 "; expr: OP_HEAD(listexpr) \n",
 "; expr: OP_TAIL(listexpr) \n",
+"; expr: OP_IDENT          \n",
 
 "; listexpr: expr\n",
 "; listexpr: OP_DOT(expr, expr)\n",

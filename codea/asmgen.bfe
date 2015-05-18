@@ -20,10 +20,11 @@ expr: numexpr                         # 1 # genTagNum(bnode->regname, kids[0]->r
 expr: listexpr                        # 1 # genTagList(bnode->regname, kids[0]->regname);
 expr: OP_HEAD(listexpr)               # 1 # genHead(bnode->regname, kids[0]->regname);
 expr: OP_TAIL(listexpr)               # 1 # genTail(bnode->regname, kids[0]->regname);
+expr: OP_IDENT                        # 1 # assignFromIdent(bnode->regname, kids[0]->regname);
 
 listexpr: OP_DOT(expr, expr)          # 1 # genDot(kids[0]->regname, kids[1]->regname);
 listexpr: OP_IDENT                    # 1 # genListFromIdent(bnode->regname, bnode->ident);
-listexpr: expr                        # 2 # genListFromReg(bnode->regname, kids[0]->regname);
+listexpr: expr                        # 1 # genListFromReg(bnode->regname, kids[0]->regname);
 
 numexpr: OP_ISNUM(expr)               # 2 # genIsNum(bnode->regname, kids[0]->regname);
 numexpr: OP_ISNUM(numexpr)            # 1 # assignFromNum(bnode->regname, 1);
