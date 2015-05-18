@@ -59,26 +59,24 @@ const char *getNextReg(const char *reg) {
 }
 
 
-static void tag(const char *reg) {
-}
-
 void extractNum(const char *reg) {
-    printf("sar $1 %%%s\n", reg);
-    printf("jmpnz raisesig\n");
+    printf("sar $1, %%%s\n", reg);
+    printf("jc raisesig\n");
 }
 
 void tagNum(const char *reg) {
-    printf("sal $1 %%%s\n", reg);
+    printf("sal $1, %%%s\n", reg);
 }
 
 void extractList(const char *reg) {
-    printf("sar $2 %%%s\n", reg);
-    printf("jmpnz raisesig\n");
+    printf("test $0x2, %%%s\n", reg);
+    printf("je raisesig\n");
+    printf("sar $2, %%%s\n", reg);
 }
 
 void tagList(const char *reg) {
-    printf("sal $2 %%%s\n", reg);
-    printf("add $1, %%%s\n", reg);
+    printf("sal $2, %%%s\n", reg);
+    printf("add $2, %%%s\n", reg);
 }
 
 void genSymbol(const char *fName) {
