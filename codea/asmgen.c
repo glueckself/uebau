@@ -69,14 +69,15 @@ void tagNum(const char *reg) {
 }
 
 void extractList(const char *reg) {
-    printf("test $0x2, %%%s\n", reg);
-    printf("je raisesig\n");
-    printf("sar $2, %%%s\n", reg);
+    printf("mov $3, %r12\n");
+    printf("and %%%s, %r12\n", reg);
+    printf("cmp $1, %r12\n");
+    printf("jne raisesig\n");
+    printf("sub $1, %%%s\n", reg);
 }
 
 void tagList(const char *reg) {
-    printf("sal $2, %%%s\n", reg);
-    printf("add $2, %%%s\n", reg);
+    printf("add $1, %%%s\n", reg);
 }
 
 void genSymbol(const char *fName) {
@@ -84,10 +85,14 @@ void genSymbol(const char *fName) {
     printf(".globl %s\n", fName);
     printf("\t.type %s, @function\n", fName);
     printf("%s:\n",fName);
+    printf("enter\n");
+    printf("pushq %r12\n");
 }
 
 void genReturn(const char *srcReg) {
-    printf("ret\n");
+    printf("pop %r12\n");
+    printf("leave\n");
+    printf("ret\n\n");
 }
 
 void genAdd(const char *dstReg, const char *srcReg) {
