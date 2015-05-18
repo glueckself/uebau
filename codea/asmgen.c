@@ -132,19 +132,30 @@ void genNot(const char *dstReg) {
 }
 
 void genLess(const char *dstReg, const char *srcReg) {
+    printf("cmp %%%s, %%%s\n", srcReg, dstReg);
+    printf("setb %%%s\n", dstReg);
 }
 
 void genEqual(const char *dstReg, const char *srcReg) {
+    printf("cmp %%%s, %%%s\n", srcReg, dstReg);
+    printf("sete %%%s", dstReg);
 }
 
 void genIsNum(const char *dstReg) {
-    
+    printf("sar $1, %%%s\n", dstReg);
+    printf("setnc %%%s\n", dstReg);
 }
 
 void genIsList(const char *dstReg) {
+    printf("mov $3, %r12\n");
+    printf("and %%%s, %r12\n", dstReg);
+    printf("cmp $1, %r12\n");
+    printf("sete %%%s\n", dstReg);
 }
 
 void genIsFun(const char *dstReg) {
+    printf("test $3, %%%s\n", dstReg);
+    printf("sete %%%s\n", dstReg);
 }
 
 const char* genDot(const char *dstReg, const char *srcReg) {
