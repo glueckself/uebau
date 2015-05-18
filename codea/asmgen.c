@@ -58,18 +58,27 @@ const char *getNextReg(const char *reg) {
     return retval;
 }
 
+
+static void tag(const char *reg) {
+}
+
 void extractNum(const char *reg) {
-    //printf("sar $2 %%%s\n", reg);
+    printf("sar $1 %%%s\n", reg);
+    printf("jmpnz raisesig\n");
 }
 
 void tagNum(const char *reg) {
-    //printf("sal $2 %%%s\n", reg);
+    printf("sal $1 %%%s\n", reg);
 }
 
 void extractList(const char *reg) {
+    printf("sar $2 %%%s\n", reg);
+    printf("jmpnz raisesig\n");
 }
 
 void tagList(const char *reg) {
+    printf("sal $2 %%%s\n", reg);
+    printf("add $1, %%%s\n", reg);
 }
 
 void genSymbol(const char *fName) {
@@ -84,74 +93,49 @@ void genReturn(const char *srcReg) {
 }
 
 void genAdd(const char *dstReg, const char *srcReg) {
-    extractNum(srcReg);
-    extractNum(dstReg);
-    printf("add %%%s, %%%s\n", srcReg, dstReg);
-    tagNum(dstReg);
+            printf("add %%%s, %%%s\n", srcReg, dstReg);
 }
 
 void genAddI(const char *dstReg, const long value) {
-    extractNum(dstReg);
-    printf("add $%d, %%%s\n", value, dstReg);
-    tagNum(dstReg);
+        printf("add $%d, %%%s\n", value, dstReg);
 }
 
 void genMinus(const char *dstReg, const char *srcReg) {
-    extractNum(srcReg);
-    extractNum(dstReg);
-    printf("sub %%%s, %%%s\n", srcReg, dstReg);
-    tagNum(dstReg);
+            printf("sub %%%s, %%%s\n", srcReg, dstReg);
 }
 
 void genMinusI(const char *dstReg, const long value) {
-    extractNum(dstReg);
-    printf("sub $%d, %%%s\n", value, dstReg);
-    tagNum(dstReg);
+        printf("sub $%d, %%%s\n", value, dstReg);
 }
     
 void genMult(const char *dstReg, const char *srcReg) {
-    extractNum(srcReg);
-    extractNum(dstReg);
-    printf("imul %%%s, %%%s\n", srcReg, dstReg);
-    tagNum(dstReg);
+            printf("imul %%%s, %%%s\n", srcReg, dstReg);
 }
 
 void genMultI(const char *dstReg, const long value) {
-    extractNum(dstReg);
-    printf("imul $%d, %%%s\n", value, dstReg);
-    tagNum(dstReg);
+        printf("imul $%d, %%%s\n", value, dstReg);
 }
 
 void genAnd(const char *dstReg, const char *srcReg) {
-    extractNum(srcReg);
-    extractNum(dstReg);
-    printf("and %%%s, %%%s\n", srcReg, dstReg);
-    tagNum(dstReg);
+            printf("and %%%s, %%%s\n", srcReg, dstReg);
 }
 
 void genAndI(const char *dstReg, const long value) {
-    extractNum(dstReg);
-    printf("and $%d, %%%s\n", value, dstReg);
-    tagNum(dstReg);
+        printf("and $%d, %%%s\n", value, dstReg);
 }
 
 void genNot(const char *dstReg) {
-    extractNum(dstReg);
-    printf("neg %%%s\n", dstReg);
-    tagNum(dstReg);
+        printf("neg %%%s\n", dstReg);
 }
 
 void genLess(const char *dstReg, const char *srcReg) {
-    extractNum(srcReg);
-    extractNum(dstReg);
 }
 
 void genEqual(const char *dstReg, const char *srcReg) {
-    extractNum(srcReg);
-    extractNum(dstReg);
 }
 
 void genIsNum(const char *dstReg) {
+    
 }
 
 void genIsList(const char *dstReg) {
@@ -161,12 +145,15 @@ void genIsFun(const char *dstReg) {
 }
 
 void genDot(const char *dstReg, const char *srcReg) {
+
 }
 
 void genHead(const char *dstReg) {
+     printf("mov 0(%%%s), %%%s\n", dstReg, dstReg);
 }
 
 void genTail(const char *dstReg) {
+     printf("mov 8(%%%s), %%%s\n", dstReg, dstReg);
 }
 
 void assignFromIdent(const char *dstReg, const char *srcReg ) {
@@ -175,7 +162,6 @@ void assignFromIdent(const char *dstReg, const char *srcReg ) {
 
 void assignFromNum(const char *reg, long value) {
     printf("mov $%d, %%%s\n", value, reg);
-    tagNum(reg);
 }
 
 
