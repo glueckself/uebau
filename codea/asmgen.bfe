@@ -1,6 +1,8 @@
 %{
 #include "asmgen.h"
-
+#ifdef DEBUG
+#include "burm_string.h"
+#endif
 %}
 
 %term OP_PLUS=1 OP_MINUS=2 OP_MULT=3 OP_AND=4 OP_NOT=5 OP_LESS=6 OP_EQUAL=7 OP_ISNUM=8 OP_ISLIST=9 OP_ISFUN=10 OP_DOT=11 OP_HEAD=12 OP_TAIL=13 OP_CALL=14 OP_IDENT=15 OP_NUM=16
