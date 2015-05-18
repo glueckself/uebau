@@ -9,14 +9,14 @@ typedef struct {
 	union {
 		void *next;
 		long value;
-	} data;
+	};
 } sListElem;
 
 #define GET_PAYLOAD(dst, src) do {		\
 	if((src)->type == ELEM_NUM)		\
-		(long)(dst) = (src)->data.value;\
+		(long)(dst) = (src)->value;     \
 	else                                    \
-		(long)(dst) = (src)->data.next;	\
+		(long)(dst) = (src)->next;	\
 } while(0);
 
 #define TAG_LIST(l) ((l) | 1)
@@ -31,7 +31,7 @@ typedef struct {
 #define LIST_HEAD(l) ( *((long*)l) )
 #define LIST_TAIL(l) ( *( ((long*)l)+1 ) )
 	
-#define LIST_EQUAL(list1, list2) do { 	\
+#define LIST_EQUAL(list1, list2) do {   	\
     int i;                                      \
     void *l1, *l2;                              \
     l1=(list1);                                 \
@@ -42,6 +42,6 @@ typedef struct {
         l1=LIST_TAIL(l1);                       \
     }                                           \
     return 1;                                   \
-} while(0);
+} while(0)
 
 
