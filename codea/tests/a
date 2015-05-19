@@ -7,7 +7,7 @@ a5 = fun x -> (x+3)*2 end;
 a6 = fun x -> (x*2)+(x-1) end;
 
 %%.0
-RET(a6(TAG_NUM(5)) == TAG_NUM(14))
+RET(a6(TAG_NUM(5)) == TAG_NUM(14));
 
 %%.0
 RET (a(TAG_NUM(1)) == TAG_NUM(4));

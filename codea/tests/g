@@ -16,6 +16,6 @@ const long list[] = {0, 1};
 RET(g1(TAG_LIST(list)) == 0);
 
 %%.xin
-RET(g1(TAG_NUM(2));
+RET(g1(TAG_NUM(2)));
 
 
