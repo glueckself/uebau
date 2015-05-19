@@ -195,20 +195,20 @@ void genNot(const char *dstReg, const char *srcReg) {
 
 void genLess(const char *dstReg, const char *srcReg1, const char *srcReg2) {
     printf("cmp %%%s, %%%s\n", srcReg1, srcReg2);
-    printf("xor %%%s, %%%s\n", dstReg, dstReg);
     printf("setc %%%s\n", getByteReg(dstReg));
+    printf("and $1 %%%s\n", dstReg);
 }
 
 void genEqual(const char *dstReg, const char *srcReg1, const char *srcReg2) {
     printf("cmp %%%s, %%%s\n", srcReg1, srcReg2);
-    printf("xor %%%s, %%%s\n", dstReg, dstReg);
     printf("sete %%%s", getByteReg(dstReg));
+    printf("and $1 %%%s\n", dstReg);
 }
 
 void genIsNum(const char *dstReg, const char *srcReg) {
     printf("sar $1, %%%s\n", srcReg);
-    printf("xor %%%s, %%%s\n", dstReg, dstReg);
     printf("setnc %%%s\n", dstReg);
+    printf("and $1 %%%s\n", dstReg);
 }
 
 void genIsList(const char *dstReg, const char *srcReg) {
@@ -216,12 +216,13 @@ void genIsList(const char *dstReg, const char *srcReg) {
     printf("and %%%s, %r12\n", srcReg);
     printf("cmp $1, %r12\n");
     printf("sete %%%s\n", getByteReg(dstReg));
+    printf("and $1 %%%s\n", dstReg);
 }
 
 void genIsFun(const char *dstReg, const char *srcReg) {
     printf("test $3, %%%s\n", srcReg);
-    printf("xor %%%s, %%%s\n", dstReg, dstReg);
     printf("sete %%%s\n", getByteReg(dstReg));
+    printf("and $1 %%%s\n", dstReg);
 }
 
 void genDot(const char *dstReg, const char *srcReg, const char *srcReg2) {
