@@ -26,13 +26,13 @@ listexpr: OP_DOT(expr, expr)          # 1 # genDot(bnode->regname, kids[0]->regn
 listexpr: OP_IDENT                    # 1 # genListFromIdent(bnode->regname, bnode->ident);
 listexpr: expr                        # 1 # genListFromReg(bnode->regname, kids[0]->regname);
 
-numexpr: OP_ISNUM(expr)               # 2 # genIsNum(bnode->regname, kids[0]->regname);
+numexpr: OP_ISNUM(expr)               # 1 # genIsNum(bnode->regname, kids[0]->regname);
 numexpr: OP_ISNUM(numexpr)            # 1 # assignFromNum(bnode->regname, 1);
 numexpr: OP_ISNUM(imm)                # 1 # assignFromNum(bnode->regname, 0);
-numexpr: OP_ISLIST(expr)              # 2 # genIsList(bnode->regname, kids[0]->regname);
+numexpr: OP_ISLIST(expr)              # 1 # genIsList(bnode->regname, kids[0]->regname);
 numexpr: OP_ISLIST(numexpr)           # 1 # assignFromNum(bnode->regname, 0);
 numexpr: OP_ISLIST(imm)               # 1 # assignFromNum(bnode->regname, 0);
-numexpr: OP_ISFUN(expr)               # 2 # genIsFun(bnode->regname, kids[0]->regname);
+numexpr: OP_ISFUN(expr)               # 1 # genIsFun(bnode->regname, kids[0]->regname);
 numexpr: OP_ISFUN(numexpr)            # 1 # assignFromNum(bnode->regname, 0);
 numexpr: OP_ISFUN(imm)                # 1 # assignFromNum(bnode->regname, 0);
 numexpr: OP_PLUS(numexpr, numexpr)    # 2 # genAdd(bnode->regname, kids[0]->regname, (kids[1]->regname));
@@ -54,7 +54,7 @@ numexpr: OP_EQUAL(expr, expr)         # 1 # genEqual(bnode->regname,kids[0]->reg
 numexpr: OP_NUM                       # 1 # assignFromNum(bnode->regname, bnode->val);
 numexpr: OP_IDENT                     # 1 # genNumFromIdent(bnode->regname, bnode->ident);
 numexpr: expr                         # 1 # genNumFromReg(bnode->regname, kids[0]->regname);
-numexpr: imm                          # 1 # bnode->val = kids[0]->val;
+numexpr: imm                          # 1 # assignFromNum(bnode->regname, kids[0]->val);
 
 imm: OP_PLUS(imm, imm)       # 0 # bnode->val = kids[0]->val + kids[1]->val;
 imm: OP_MINUS(imm, imm)      # 0 # bnode->val = kids[0]->val - kids[1]->val;
