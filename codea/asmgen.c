@@ -8,6 +8,7 @@
 #define ENABLE_OPT_TYPECHECK 1
 
 const char *regNames[] = {"rax", "rdi", "r11", "r10", "r9", "r8", "rcx", "rdx", "rsi", NULL};
+const char *reg8Names[] = {"al", "dil", "r11b", "r10b", "r9b", "r8b", "cl", "dl", "sil", NULL};
 const int numRegs = (sizeof(regNames)/sizeof(char*)) - 1;
 
 NODEPTR_TYPE newNode(eOp op, NODEPTR_TYPE left, NODEPTR_TYPE right) {
@@ -58,6 +59,19 @@ const char *getNextReg(const char *reg) {
     }
     
     return retval;
+}
+
+static const char *getByteReg(const char *reg) {
+    int i;
+    
+    if(reg == NULL)
+        return NULL;
+    
+    for(i=0; regNames[i] != NULL; i++) {
+        if(strcmp(reg, regNames[i]) == 0)
+            return reg8Names[i];
+    }
+    return NULL;
 }
 
 static void move(const char *dstReg, const char *srcReg) {
@@ -181,16 +195,19 @@ void genNot(const char *dstReg, const char *srcReg) {
 
 void genLess(const char *dstReg, const char *srcReg1, const char *srcReg2) {
     printf("cmp %%%s, %%%s\n", srcReg1, srcReg2);
-    printf("setb %%%s\n", dstReg);
+    printf("xor %%%s, %%%s\n", dstReg, dstReg);
+    printf("setc %%%s\n", getByteReg(dstReg));
 }
 
 void genEqual(const char *dstReg, const char *srcReg1, const char *srcReg2) {
     printf("cmp %%%s, %%%s\n", srcReg1, srcReg2);
-    printf("sete %%%s", dstReg);
+    printf("xor %%%s, %%%s\n", dstReg, dstReg);
+    printf("sete %%%s", getByteReg(dstReg));
 }
 
 void genIsNum(const char *dstReg, const char *srcReg) {
     printf("sar $1, %%%s\n", srcReg);
+    printf("xor %%%s, %%%s\n", dstReg, dstReg);
     printf("setnc %%%s\n", dstReg);
 }
 
@@ -198,12 +215,13 @@ void genIsList(const char *dstReg, const char *srcReg) {
     printf("mov $3, %r12\n");
     printf("and %%%s, %r12\n", srcReg);
     printf("cmp $1, %r12\n");
-    printf("sete %%%s\n", dstReg);
+    printf("sete %%%s\n", getByteReg(dstReg));
 }
 
 void genIsFun(const char *dstReg, const char *srcReg) {
     printf("test $3, %%%s\n", srcReg);
-    printf("sete %%%s\n", dstReg);
+    printf("xor %%%s, %%%s\n", dstReg, dstReg);
+    printf("sete %%%s\n", getByteReg(dstReg));
 }
 
 void genDot(const char *dstReg, const char *srcReg, const char *srcReg2) {
