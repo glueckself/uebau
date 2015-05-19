@@ -3,3 +3,19 @@ g1 = fun x -> head x end;
 g2 = fun x -> head (x.1) end;
 g3 = fun x -> tail x end;
 g4 = fun x -> tail (x.2) end;
+
+%%.0
+RET(g(TAG_NUM(3)) == TAG_NUM(0));
+
+%%.0
+RET(g(TAG_LIST(0)) == TAG_NUM(0));
+
+%%.0
+const long list[] = {0, 1};
+
+RET(g1(TAG_LIST(list)) == 0);
+
+%%.xin
+RET(g1(TAG_NUM(2));
+
+

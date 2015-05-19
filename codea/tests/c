@@ -1,3 +1,15 @@
 c = fun x -> x-3 end;
 c1 = fun x -> (x-3)-4 end;
 c2 = fun x -> (x-4)*3 end;
+
+%%.0
+RET(c(TAG_NUM(5)) == TAG_NUM(2));
+
+%%.0
+RET(c1(TAG_NUM(10)) == TAG_NUM(3));
+
+%%.0
+RET(c2(TAG_NUM(8)) == TAG_NUM(12));
+
+%%.xin
+RET(c2(TAG_LIST(0)));

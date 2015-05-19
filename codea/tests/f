@@ -3,3 +3,40 @@ f1 = fun x -> isnum 5 end;
 f2 = fun x -> islist x end;
 f3 = fun x -> islist (0.0) end;
 f4 = fun x -> isfun 3 end;
+f5 = fun x -> isfun x end;
+
+%%.0
+RET(f(TAG_NUM(2)) == TAG_NUM(1));
+
+%%.0
+RET(f(TAG_LIST(0)) == TAG_NUM(0));
+
+%%.0
+RET(f1(TAG_NUM(2)) == TAG_NUM(1));
+
+%%.0
+RET(f1(TAG_LIST(0)) == TAG_NUM(1));
+
+%%.0
+RET(f2(TAG_LIST(0)) == TAG_NUM(1));
+
+%%.0
+RET(f2(TAG_NUM(0)) == TAG_NUM(0));
+
+%%.0
+RET(f3(TAG_LIST(0)) == TAG_NUM(1));
+
+%%.0
+RET(f3(TAG_NUM(0)) == TAG_NUM(1));
+
+%%.0
+RET(f4(TAG_LIST(0)) == TAG_NUM(0));
+
+%%.0
+RET(f4(TAG_NUM(0)) == TAG_NUM(0));
+
+%%.0
+RET(f5(TAG_LIST(0)) == TAG_NUM(0));
+
+%%.0
+RET(f5(TAG_NUM(0)) == TAG_NUM(0));

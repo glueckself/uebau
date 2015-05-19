@@ -1,3 +1,21 @@
 e = fun x -> x = x end;
 e1 = fun x -> x = 5 end;
 e2 = fun x -> x = (5.2) end;
+
+%%.0
+RET(e(TAG_NUM(5)) == TAG_NUM(1));
+
+%%.0
+RET(e(TAG_LIST(0)) == TAG_NUM(1));
+
+%%.0
+RET(e1(TAG_NUM(5)) == TAG_NUM(1));
+
+%%.0
+RET(e1(TAG_NUM(4)) == TAG_NUM(0));
+
+%%.0
+RET(e2(TAG_NUM(4)) == TAG_NUM(0));
+
+%%.0
+RET(e2(TAG_LIST(0)) == TAG_NUM(0));
