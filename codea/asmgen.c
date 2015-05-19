@@ -7,7 +7,7 @@
 
 #define ENABLE_OPT_TYPECHECK 1
 
-const char *regNames[] = {"rax", "rdi", "r11", "r10", "r9", "r8", "rcx", "rdx", "rsi", NULL};
+const char *regNames[] = {"rdi", "rax", "r11", "r10", "r9", "r8", "rcx", "rdx", "rsi", NULL};
 const int numRegs = (sizeof(regNames)/sizeof(char*)) - 1;
 
 NODEPTR_TYPE newNode(eOp op, NODEPTR_TYPE left, NODEPTR_TYPE right) {
@@ -43,7 +43,9 @@ const char *getNextReg(const char *reg) {
     const char *retval;
     
     if(reg == NULL) {
+#if DEBUG
         printf("; returning start %rax\n");
+#endif
         return regNames[0];
     }
     
@@ -58,8 +60,10 @@ const char *getNextReg(const char *reg) {
         printf("Failed to allocate register, aborting\n");
         exit(4);
     }
-    
+
+#if DEBUG
     printf("; returning reg: %s\n", retval);
+#endif
     return retval;
 }
 
@@ -75,12 +79,18 @@ static void extractNum(const char *reg) {
 }
 
 void genNumFromIdent(const char *regname, symbol_t *sym) {
-#if ENABLE_OPT_TYPECHECK
-    if(sym->type == TYPE_NUM)
-        return;
-    sym->type=TYPE_NUM;
+#if DEBUG
+    printf("; genNumFromIdent: sym at %x: %s (%s) -> %s\n", sym, sym->name, sym->regname, regname);
 #endif
-    extractNum(sym->regname);
+    
+    
+#if ENABLE_OPT_TYPECHECK
+    if(sym->type != TYPE_NUM) {
+        sym->type=TYPE_NUM;
+        extractNum(sym->regname);
+    }
+#endif
+    
     move(regname, sym->regname);
 }
 
