@@ -194,14 +194,14 @@ void genNot(const char *dstReg, const char *srcReg) {
 }
 
 void genLess(const char *dstReg, const char *srcReg1, const char *srcReg2) {
-    printf("cmp %%%s, %%%s\n", srcReg1, srcReg2);
+    printf("cmp %%%s, %%%s\n", srcReg2, srcReg1);
     printf("setc %%%s\n", getByteReg(dstReg));
     printf("and $1, %%%s\n", dstReg);
 }
 
 void genEqual(const char *dstReg, const char *srcReg1, const char *srcReg2) {
     printf("cmp %%%s, %%%s\n", srcReg1, srcReg2);
-    printf("sete %%%s", getByteReg(dstReg));
+    printf("sete %%%s\n", getByteReg(dstReg));
     printf("and $1, %%%s\n", dstReg);
 }
 
