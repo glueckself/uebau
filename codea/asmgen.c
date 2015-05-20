@@ -7,8 +7,8 @@
 
 #define ENABLE_OPT_TYPECHECK 1
 
-const char *regNames[] = {"rax", "rdi", "r11", "r10", "r9", "r8", "rcx", "rdx", "rsi", NULL};
-const char *reg8Names[] = {"al", "dil", "r11b", "r10b", "r9b", "r8b", "cl", "dl", "sil", NULL};
+const char *regNames[] = {"rax", "r11", "r10", "r9", "r8", "rcx", "rdx", "rsi", NULL};
+const char *reg8Names[] = {"al", "r11b", "r10b", "r9b", "r8b", "cl", "dl", "sil", NULL};
 const int numRegs = (sizeof(regNames)/sizeof(char*)) - 1;
 
 NODEPTR_TYPE newNode(eOp op, NODEPTR_TYPE left, NODEPTR_TYPE right) {
