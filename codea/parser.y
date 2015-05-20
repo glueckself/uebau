@@ -76,7 +76,7 @@ Def: IDENT EQUAL Lambda @{
         
         @t checkGlobalSymbol(@Def.globSym@, @IDENT.val@);
         
-        @reg @Lambda.node@->regname = getNextReg(NULL);
+        @reg @Lambda.node@->regname = "rax";
         
         @codegen genSymbol(@IDENT.val@);
         @codegen burm_label(@Def.node@); burm_reduce(@Def.node@, 1);
@@ -231,8 +231,8 @@ DotTerm: Term DOT Term @{
        | Term DOT DotTerm @{
             @i @DotTerm.0.node@ = newNode(OP_DOT, @Term.node@, @DotTerm.1.node@);
             
-            @reg @DotTerm.1.node@->regname = @DotTerm.0.node@->regname;
-            @reg @Term.0.node@->regname = getNextReg(@DotTerm.0.node@->regname);
+            @reg @DotTerm.1.node@->regname = getNextReg(@DotTerm.0.node@->regname);
+            @reg @Term.0.node@->regname = (@DotTerm.0.node@->regname);
          @}
        ;
 

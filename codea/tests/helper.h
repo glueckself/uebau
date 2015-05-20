@@ -30,32 +30,32 @@ typedef struct {
 #define LIST_HEAD(l) ( ((long*)l)[0] )
 #define LIST_TAIL(l) ( ((long*)l)[1] )
 	
-#define LIST_EQUAL(list1, list2) do {   	\
-    int i;                                      \
-    long val;                                   \
-    void *l1;                                   \
-    sListElem *l2;                              \
-    l1=(list1);                                 \
-    l2=(list2);                                 \
-    for(i=0; l2[i].type != ELEM_END; i++) {     \
-        printf("checking list at %x\n", l1);    \
-        if(!IS_LIST(l1)) {                      \
-            printf("not a list: %x\n", (long)l1); \
-            return 0;                           \
-        }                                       \
-        l1=UNTAG_LIST(l1);                      \
-        val=LIST_HEAD(l1);                      \
-        if(val != l2[i].head) {                 \
-            printf("head mismatch: %d/%d\n", val, l2[i].head); \
-            return 0;                           \
-        }                                       \
-        l1=LIST_TAIL(l1);                       \
-        if(l2[i].tail && (l2[i].tail != l1)) {  \
-            printf("tail mismatch: %d/%d\n", l1, l2[i].tail); \
-            return 0;                           \
-        }                                       \
-    }                                           \
-    return 1;                                   \
+#define LIST_EQUAL(list1, list2) do {   	                \
+    int i;                                                      \
+    long val;                                                   \
+    void *l1;                                                   \
+    sListElem *l2;                                              \
+    l1=(void*)(list1);                                          \
+    l2=(list2);                                                 \
+    for(i=0; l2[i].type != ELEM_END; i++) {                     \
+        printf("checking list at %x\n", l1);                    \
+        if(!IS_LIST(l1)) {                                      \
+            printf("not a list: %x\n", (long)l1);               \
+            return 0;                                           \
+        }                                                       \
+        l1=UNTAG_LIST(l1);                                      \
+        val=LIST_HEAD(l1);                                      \
+        if(val != l2[i].head) {                                 \
+            printf("head mismatch: %d/%d\n", val, l2[i].head);  \
+            return 0;                                           \
+        }                                                       \
+        l1=LIST_TAIL(l1);                                       \
+        if(l2[i].tail && (l2[i].tail != (long)l1)) {            \
+            printf("tail mismatch: %d/%d\n", l1, l2[i].tail);   \
+            return 0;                                           \
+                      }                                         \
+    }                                                           \
+    return 1;                                                   \
 } while(0)
 
 
