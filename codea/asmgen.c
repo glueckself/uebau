@@ -87,11 +87,11 @@ static void extractNum(const char *reg) {
 
 void genNumFromIdent(const char *regname, symbol_t *sym) {
 #if ENABLE_OPT_TYPECHECK
-    if(sym->type == TYPE_NUM)
-        return;
-    sym->type=TYPE_NUM;
+    if(sym->type != TYPE_NUM) {
+        extractNum(sym->regname);
+        sym->type=TYPE_NUM;
+    }
 #endif
-    extractNum(sym->regname);
     move(regname, sym->regname);
 }
 
