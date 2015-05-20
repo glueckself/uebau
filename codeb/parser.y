@@ -113,11 +113,14 @@ Expr: IF Expr THEN Expr ELSE Expr END @{
       @} 
     | Lambda
     | LET IDENT EQUAL Expr IN Expr END @{ 
+          @i @Expr.2.sym@ = mergeLists(mergeLists(mkList(@IDENT.val@), @Expr.0.sym@), @Expr.1.sym@);
+          @i @Expr.0.node@ = newNode(OP_LET, @Expr.1.node@, @Expr.2.node@);
+          
           @t checkUnknownSymbol(@Expr.1.sym@, @IDENT.val@);
           @t checkUnknownSymbol(@Expr.0.sym@, @IDENT.val@); 
           
-          @i @Expr.2.sym@ = mergeLists(mergeLists(mkList(@IDENT.val@), @Expr.0.sym@), @Expr.1.sym@);
-          @i @Expr.0.node@ = NULL;
+          @reg @Expr.1.node@->regname = getNextParamReg(@Expr.regList@, @Expr.0.node@->regname); addSymbolStorage(@Expr.2.sym@, @IDENT.val@, @Expr.1.node@->regname);
+          @reg @Expr.2.node@->regname = @Expr.0.node@->regname;
       @}
     | EExpr @{
           @i @Expr.node@ = @EExpr.node@;

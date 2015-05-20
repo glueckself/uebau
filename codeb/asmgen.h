@@ -38,7 +38,8 @@ typedef enum {
     OP_NUM=16,
     OP_EVAL=17,
     OP_IF=18,
-    OP_CONDEVAL=19
+    OP_CONDEVAL=19,
+    OP_LET=20
 } eOp;
 
 typedef struct _NodeType *NODEPTR_TYPE;

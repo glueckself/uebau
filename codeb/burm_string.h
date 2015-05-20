@@ -8,10 +8,12 @@
 
 
 
+
 const char* burm_string[] = {
 "",
-"; fun: OP_CALL(expr)\n",
+"; eval: OP_CALL(expr)\n",
 "; eval: expr\n",
+"; eval: condeval\n",
 
 "; expr: numexpr \n",
 "; expr: listexpr\n",
@@ -19,8 +21,11 @@ const char* burm_string[] = {
 "; expr: OP_TAIL(listexpr) \n",
 "; expr: OP_IDENT\n",
 "; expr: OP_IF\n",
+"; expr: OP_LET(expr)\n",
 
 "; condeval: OP_CONDEVAL(expr, expr)\n",
+"; thenexpr: expr\n",
+"; elseexpr: expr\n",
 
 "; listexpr: OP_DOT(expr, expr)\n",
 "; listexpr: OP_IDENT\n",

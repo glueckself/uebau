@@ -5,7 +5,7 @@
 #endif
 %}
 
-%term OP_PLUS=1 OP_MINUS=2 OP_MULT=3 OP_AND=4 OP_NOT=5 OP_LESS=6 OP_EQUAL=7 OP_ISNUM=8 OP_ISLIST=9 OP_ISFUN=10 OP_DOT=11 OP_HEAD=12 OP_TAIL=13 OP_CALL=14 OP_IDENT=15 OP_NUM=16 OP_IF=18 OP_CONDEVAL=19
+%term OP_PLUS=1 OP_MINUS=2 OP_MULT=3 OP_AND=4 OP_NOT=5 OP_LESS=6 OP_EQUAL=7 OP_ISNUM=8 OP_ISLIST=9 OP_ISFUN=10 OP_DOT=11 OP_HEAD=12 OP_TAIL=13 OP_CALL=14 OP_IDENT=15 OP_NUM=16 OP_IF=18 OP_CONDEVAL=19 OP_LET=20
 
 %%
 
@@ -19,6 +19,7 @@ expr: OP_HEAD(listexpr)               # 1 # genHead(bnode->regname, kids[0]->reg
 expr: OP_TAIL(listexpr)               # 1 # genTail(bnode->regname, kids[0]->regname);
 expr: OP_IDENT                        # 1 # assignFromIdent(bnode->regname, bnode->ident->regname);
 expr: OP_IF(numexpr)                  # 1 # genIf(bnode->regname, bnode->labelNum); burm_label(bnode->kids[1]); burm_reduce(bnode->kids[1],1);
+expr: OP_LET(expr)                    # 1 # burm_label(bnode->kids[1]); burm_reduce(bnode->kids[1], 1);
 
 condeval: OP_CONDEVAL(thenexpr, elseexpr) # 0 #  
 thenexpr: expr                        # 0 # genElseLabel(bnode->regname, bnode->parent->labelNum);
