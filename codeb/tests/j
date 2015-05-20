@@ -1,6 +1,8 @@
 j = fun x -> if x = 5 then 2 else 1 end end;
 
-j1 = fun x ->
+// j1 is gcc built-in!!!
+
+j2 = fun x ->
     if x < 5
         then if x = 2
                 then 10
@@ -13,9 +15,9 @@ j1 = fun x ->
     end
 end;
 
-j2 = fun x -> if (head x) = 10 then 1 else 15 end end;
+j3 = fun x -> if (head x) = 10 then 1 else 15 end end;
 
-j3 = fun x -> if x = 5 then x + 2 else x - 1 end end;
+j4 = fun x -> if x = 5 then x + 2 else x - 1 end end;
 
 %%.0
 RET(j(TAG_NUM(5)) == TAG_NUM(2));
@@ -27,33 +29,33 @@ RET(j(TAG_NUM(4)) == TAG_NUM(1));
 RET(j(TAG_LIST(2)) == TAG_NUM(1));
 
 %%.0
-RET(j1(TAG_NUM(1)) == TAG_NUM(15));
+RET(j2(TAG_NUM(1)) == TAG_NUM(15));
 
 %%.0
-RET(j1(TAG_NUM(2)) == TAG_NUM(10));
+RET(j2(TAG_NUM(2)) == TAG_NUM(10));
 
 %%.0
-RET(j1(TAG_NUM(8)) == TAG_NUM(20));
+RET(j2(TAG_NUM(8)) == TAG_NUM(20));
 
 %%.0
-RET(j1(TAG_NUM(10)) == TAG_NUM(25));
+RET(j2(TAG_NUM(10)) == TAG_NUM(25));
 
 %%.0
 const long list[] = {TAG_NUM(10), 0};
-RET(j2(TAG_LIST(list)) == TAG_NUM(1));
+RET(j3(TAG_LIST(list)) == TAG_NUM(1));
 
 %%.0
 const long list[] = {0,10};
-RET(j2(TAG_LIST(list)) == TAG_NUM(15));
+RET(j3(TAG_LIST(list)) == TAG_NUM(15));
 
 %%.xin
-RET(j2(TAG_NUM(1)));
+RET(j3(TAG_NUM(1)));
 
 %%.0
-RET(j3(TAG_NUM(5)) == TAG_NUM(7));
+RET(j4(TAG_NUM(5)) == TAG_NUM(7));
 
 %%.0
-RET(j3(TAG_NUM(4)) == TAG_NUM(3));
+RET(j4(TAG_NUM(4)) == TAG_NUM(3));
 
 %%.xin
-RET(j3(TAG_LIST(1)));
+RET(j4(TAG_LIST(1)));
