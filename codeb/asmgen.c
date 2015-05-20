@@ -249,8 +249,8 @@ void assignFromNum(const char *reg, long value) {
 }
 
 void genIf(const char *reg, int labelNum) {
-    printf("cmp $0 %%%s\n", reg);
-    printf("jne elseLb%d\n", labelNum);
+    printf("cmp $0, %%%s\n", reg);
+    printf("je elseLb%d\n", labelNum);
 }
 
 void genElseLabel(const char *reg, int labelNum) {
