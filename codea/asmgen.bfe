@@ -5,7 +5,9 @@
 #endif
 
 /*
+numexpr: OP_ISFUN(numexpr)            # 1 # assignFromNum(bnode->regname, 0);
 
+numexpr: OP_ISLIST(numexpr)           # 1 # assignFromNum(bnode->regname, 0);
 expr: OP_IDENT                        # 1 # assignFromIdent(bnode->regname, bnode->ident->regname);
 */
 %}
@@ -28,13 +30,11 @@ listexpr: expr                        # 1 # genListFromReg(bnode->regname, kids[
 
 numexpr: OP_ISNUM(expr)               # 1 # genIsNum(bnode->regname, kids[0]->regname);
 numexpr: OP_ISNUM(numexpr)            # 1 # assignFromNum(bnode->regname, 1);
-numexpr: OP_ISNUM(imm)                # 1 # assignFromNum(bnode->regname, 0);
+numexpr: OP_ISNUM(imm)                # 1 # assignFromNum(bnode->regname, 1);
 numexpr: OP_ISLIST(expr)              # 1 # genIsList(bnode->regname, kids[0]->regname);
-numexpr: OP_ISLIST(numexpr)           # 1 # assignFromNum(bnode->regname, 0);
-numexpr: OP_ISLIST(imm)               # 1 # assignFromNum(bnode->regname, 0);
 numexpr: OP_ISFUN(expr)               # 1 # genIsFun(bnode->regname, kids[0]->regname);
-numexpr: OP_ISFUN(numexpr)            # 1 # assignFromNum(bnode->regname, 0);
 numexpr: OP_ISFUN(imm)                # 1 # assignFromNum(bnode->regname, 0);
+numexpr: OP_ISLIST(imm)               # 1 # assignFromNum(bnode->regname, 0);
 numexpr: OP_PLUS(numexpr, numexpr)    # 2 # genAdd(bnode->regname, kids[0]->regname, (kids[1]->regname));
 numexpr: OP_PLUS(numexpr, imm)        # 1 # genAddI(bnode->regname, kids[0]->regname, kids[1]->val);
 numexpr: OP_PLUS(imm, numexpr)        # 1 # genAddI(bnode->regname, kids[1]->regname, kids[0]->val);
