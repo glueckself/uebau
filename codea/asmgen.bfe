@@ -7,6 +7,14 @@
 /*
 numexpr: OP_ISFUN(numexpr)            # 1 # assignFromNum(bnode->regname, 0);
 
+listexpr: OP_DOT(expr, listexpr)      # 1 # genDot(bnode->regname, kids[0]->regname, kids[1]->regname);
+listexpr: OP_DOT(expr, numeexpr)      # 1 # genDot(bnode->regname, kids[0]->regname, kids[1]->regname);
+listexpr: OP_DOT(numexpr, expr)       # 1 # genDot(bnode->regname, kids[0]->regname, kids[1]->regname);
+listexpr: OP_DOT(numexpr, listexpr)   # 1 # genDot(bnode->regname, kids[0]->regname, kids[1]->regname);
+listexpr: OP_DOT(numexpr, numexpr)    # 1 # genDot(bnode->regname, kids[0]->regname, kids[1]->regname);
+listexpr: OP_DOT(listexpr,expr)       # 1 # genDot(bnode->regname, kids[0]->regname, kids[1]->regname);
+listexpr: OP_DOT(listexpr,numexpr)    # 1 # genDot(bnode->regname, kids[0]->regname, kids[1]->regname);
+listexpr: OP_DOT(listexpr,listexpr)   # 1 # genDot(bnode->regname, kids[0]->regname, kids[1]->regname);
 numexpr: OP_ISLIST(numexpr)           # 1 # assignFromNum(bnode->regname, 0);
 expr: OP_IDENT                        # 1 # assignFromIdent(bnode->regname, bnode->ident->regname);
 */
@@ -26,14 +34,6 @@ expr: OP_IDENT                        # 1 # assignFromIdent(bnode->regname, bnod
 
 listexpr: OP_DOT(expr, expr)          # 1 # genDot(bnode->regname, kids[0]->regname, kids[1]->regname);
 listexpr: OP_IDENT                    # 1 # genListFromIdent(bnode->regname, bnode->ident);
-listexpr: OP_DOT(expr, listexpr)      # 1 # genDot(bnode->regname, kids[0]->regname, kids[1]->regname);
-listexpr: OP_DOT(expr, numeexpr)      # 1 # genDot(bnode->regname, kids[0]->regname, kids[1]->regname);
-listexpr: OP_DOT(numexpr, expr)       # 1 # genDot(bnode->regname, kids[0]->regname, kids[1]->regname);
-listexpr: OP_DOT(numexpr, listexpr)   # 1 # genDot(bnode->regname, kids[0]->regname, kids[1]->regname);
-listexpr: OP_DOT(numexpr, numexpr)    # 1 # genDot(bnode->regname, kids[0]->regname, kids[1]->regname);
-listexpr: OP_DOT(listexpr,expr)       # 1 # genDot(bnode->regname, kids[0]->regname, kids[1]->regname);
-listexpr: OP_DOT(listexpr,numexpr)    # 1 # genDot(bnode->regname, kids[0]->regname, kids[1]->regname);
-listexpr: OP_DOT(listexpr,listexpr)   # 1 # genDot(bnode->regname, kids[0]->regname, kids[1]->regname);
 listexpr: expr                        # 1 # genListFromReg(bnode->regname, kids[0]->regname);
 
 numexpr: OP_ISNUM(expr)               # 1 # genIsNum(bnode->regname, kids[0]->regname);
