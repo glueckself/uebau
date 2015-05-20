@@ -190,7 +190,7 @@ void genAndI(const char *dstReg, const char *srcReg, const long value) {
 
 void genNot(const char *dstReg, const char *srcReg) {
     move(dstReg, srcReg);
-    printf("not %%%s\n", dstReg);
+    printf("xor $1, %%%s\n", dstReg);
 }
 
 void genLess(const char *dstReg, const char *srcReg1, const char *srcReg2) {
