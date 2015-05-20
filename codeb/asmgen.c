@@ -5,7 +5,7 @@
 #endif
 #include "asmgen.h"
 
-#define ENABLE_OPT_TYPECHECK 1
+#define ENABLE_OPT_TYPECHECK 0
 
 const char *regNames[] = {"rax", "r11", "r10", "r9", "r8", "rcx", "rdx", "rsi", NULL};
 const char *reg8Names[] = {"al", "r11b", "r10b", "r9b", "r8b", "cl", "dl", "sil", NULL};
@@ -92,7 +92,12 @@ void genNumFromIdent(const char *regname, symbol_t *sym) {
         sym->type=TYPE_NUM;
     }
 #endif
+
     move(regname, sym->regname);
+
+#if ENABLE_OPT_TYPECHECK == 0
+    extractNum(regname);
+#endif
 }
 
 void genNumFromReg(const char *dstReg, const char *srcReg) {
@@ -115,12 +120,16 @@ static void extractList(const char *reg) {
 
 void genListFromIdent(const char *regname, symbol_t *sym) {
 #if ENABLE_OPT_TYPECHECK
-    if(sym->type == TYPE_LIST)
-        return;
-    sym->type=TYPE_LIST;
+    if(sym->type != TYPE_LIST) {
+        sym->type=TYPE_LIST;
+        extractList(sym->regname);
+    }
 #endif
-    extractList(sym->regname);
+    
     move(regname, sym->regname);
+#if ENABLE_OPT_TYPECHECK == 0
+    extractList(regname);
+#endif
 }
 
 void genListFromReg(const char *dstReg, const char *srcReg) {
