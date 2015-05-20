@@ -39,14 +39,15 @@
 %token ARROW
 
 @autoinh sym
+@autoinh regList
 @autosyn globVal
-@autosyn node;
+@autosyn node
 
 @attributes {unsigned int val;} NUM
 @attributes {char *val;}        IDENT
 @attributes {symbol_t *globSym;} Program
-@attributes {symbol_t *globSym; char *globVal; NODEPTR_TYPE node; } Def
-@attributes {symbol_t *sym; NODEPTR_TYPE node;} Lambda Expr EExpr KExpr AddTerm MultTerm DotTerm AndTerm Term
+@attributes {symbol_t *globSym; char *globVal; NODEPTR_TYPE node; sRegister *regList;} Def
+@attributes {symbol_t *sym; NODEPTR_TYPE node; sRegister *regList; } Lambda Expr EExpr KExpr AddTerm MultTerm DotTerm AndTerm Term
 
 @traversal @postorder t
 @traversal @preorder reg
@@ -60,11 +61,13 @@ File:
 Program: Def SEMICOLON @{
              @i @Program.globSym@ = mkList(@Def.globVal@);
              @i @Def.globSym@ = @Program.globSym@;
+             @i @Def.regList@ = newRegList();
          @}
 /*       | @{ @i @Program.globSym@ = NULL; @}*/
        | Program Def SEMICOLON @{
              @i @Program.globSym@ = addGlobalSymbol(@Program.1.globSym@, @Def.globVal@);
              @i @Def.globSym@ = @Program.globSym@;
+             @i @Def.regList@ = newRegList();
          @}
        ;
 
@@ -76,7 +79,7 @@ Def: IDENT EQUAL Lambda @{
         
         @t checkGlobalSymbol(@Def.globSym@, @IDENT.val@);
         
-        @reg @Lambda.node@->regname = "rax";
+        @reg @Lambda.node@->regname = getNextReg(@Def.regList@, NULL);
         
         @codegen genSymbol(@IDENT.val@);
         @codegen burm_label(@Def.node@); burm_reduce(@Def.node@, 1);
@@ -90,7 +93,7 @@ Lambda:	FUN IDENT ARROW Expr END @{
             
             @t checkUnknownSymbol(@Lambda.sym@, @IDENT.val@);
             
-            @reg addSymbolStorage(@Expr.sym@, @IDENT.val@, "rdi");;
+            @reg addSymbolStorage(@Expr.sym@, @IDENT.val@, getNextParamReg(@Lambda.regList@));
             @reg @Expr.node@->regname = @Lambda.node@->regname;
         @}
       ;
@@ -135,19 +138,19 @@ Expr: IF Expr THEN Expr ELSE Expr END @{
           @i @Expr.node@ = newNode(OP_MINUS, @Term.0.node@, @Term.1.node@);
           
           @reg @Term.0.node@->regname = @Expr.node@->regname;
-          @reg @Term.1.node@->regname = getNextReg(@Expr.node@->regname);
+          @reg @Term.1.node@->regname = getNextReg(@Expr.regList@, @Expr.node@->regname);
       @}
     | Term LESS Term @{
           @i @Expr.node@ = newNode(OP_LESS, @Term.0.node@, @Term.1.node@);
           
           @reg @Term.0.node@->regname = @Expr.node@->regname;
-          @reg @Term.1.node@->regname = getNextReg(@Expr.node@->regname);
+          @reg @Term.1.node@->regname = getNextReg(@Expr.regList@, @Expr.node@->regname);
       @}
     | Term EQUAL Term @{
           @i @Expr.node@ = newNode(OP_EQUAL, @Term.0.node@, @Term.1.node@);
           
           @reg @Term.0.node@->regname = @Expr.node@->regname;
-          @reg @Term.1.node@->regname = getNextReg(@Expr.node@->regname);
+          @reg @Term.1.node@->regname = getNextReg(@Expr.regList@, @Expr.node@->regname);
       @}
     | Expr Term @{ @i @Expr.0.node@ = NULL; @}
     ;
@@ -196,13 +199,13 @@ AddTerm: Term PLUS Term @{
             @i @AddTerm.node@ = newNode(OP_PLUS, @Term.0.node@, @Term.1.node@);
             
           @reg @Term.0.node@->regname = @AddTerm.node@->regname;
-          @reg @Term.1.node@->regname = getNextReg(@AddTerm.node@->regname);
+          @reg @Term.1.node@->regname = getNextReg(@AddTerm.regList@, @AddTerm.node@->regname);
          @}
        | AddTerm PLUS Term @{
             @i @AddTerm.0.node@ = newNode(OP_PLUS, @AddTerm.1.node@, @Term.node@);
             
             @reg @AddTerm.1.node@->regname = @AddTerm.0.node@->regname;
-            @reg @Term.0.node@->regname = getNextReg(@AddTerm.0.node@->regname);
+            @reg @Term.0.node@->regname = getNextReg(@AddTerm.regList@, @AddTerm.0.node@->regname);
          @}
        ;
 
@@ -210,13 +213,13 @@ MultTerm: Term MULT Term @{
             @i @MultTerm.node@ = newNode(OP_MULT, @Term.0.node@, @Term.1.node@);
             
           @reg @Term.0.node@->regname = @MultTerm.node@->regname;
-          @reg @Term.1.node@->regname = getNextReg(@MultTerm.node@->regname);
+          @reg @Term.1.node@->regname = getNextReg(@MultTerm.regList@, @MultTerm.node@->regname);
           @}
         | MultTerm MULT Term @{
             @i @MultTerm.0.node@ = newNode(OP_MULT, @MultTerm.1.node@, @Term.node@);
             
             @reg @MultTerm.1.node@->regname = @MultTerm.0.node@->regname;
-            @reg @Term.0.node@->regname = getNextReg(@MultTerm.0.node@->regname);
+            @reg @Term.0.node@->regname = getNextReg(@MultTerm.regList@, @MultTerm.0.node@->regname);
           @}
         ;
 
@@ -224,13 +227,13 @@ AndTerm: Term AND Term @{
             @i @AndTerm.node@ = newNode(OP_AND, @Term.0.node@, @Term.1.node@);
             
           @reg @Term.0.node@->regname = @AndTerm.node@->regname;
-          @reg @Term.1.node@->regname = getNextReg(@AndTerm.node@->regname);
+          @reg @Term.1.node@->regname = getNextReg(@AndTerm.regList@, @AndTerm.node@->regname);
          @}
        | AndTerm AND Term @{
             @i @AndTerm.0.node@ = newNode(OP_AND, @AndTerm.1.node@, @Term.node@);
             
             @reg @AndTerm.1.node@->regname = @AndTerm.0.node@->regname;
-            @reg @Term.0.node@->regname = getNextReg(@AndTerm.0.node@->regname);
+            @reg @Term.0.node@->regname = getNextReg(@AndTerm.regList@, @AndTerm.0.node@->regname);
           @}
        ;
 
@@ -238,12 +241,12 @@ DotTerm: Term DOT Term @{
             @i @DotTerm.node@ = newNode(OP_DOT, @Term.0.node@, @Term.1.node@);
             
           @reg @Term.0.node@->regname = @DotTerm.node@->regname;
-          @reg @Term.1.node@->regname = getNextReg(@DotTerm.node@->regname);
+          @reg @Term.1.node@->regname = getNextReg(@DotTerm.regList@, @DotTerm.node@->regname);
          @}
        | Term DOT DotTerm @{
             @i @DotTerm.0.node@ = newNode(OP_DOT, @Term.node@, @DotTerm.1.node@);
             
-            @reg @DotTerm.1.node@->regname = getNextReg(@DotTerm.0.node@->regname);
+            @reg @DotTerm.1.node@->regname = getNextReg(@DotTerm.regList@, @DotTerm.0.node@->regname);
             @reg @Term.0.node@->regname = (@DotTerm.0.node@->regname);
          @}
        ;

@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #ifndef CODE
 #define CODE
@@ -7,9 +9,18 @@
 
 #define ENABLE_OPT_TYPECHECK 0
 
-const char *regNames[] = {"rax", "r11", "r10", "r9", "r8", "rcx", "rdx", "rsi", NULL};
-const char *reg8Names[] = {"al", "r11b", "r10b", "r9b", "r8b", "cl", "dl", "sil", NULL};
-const int numRegs = (sizeof(regNames)/sizeof(char*)) - 1;
+const sRegister regListTemplate[] = {
+    {"rax", "al", 0, 0},
+    {"rdi", "dil", 0, 0},
+    {"r11", "r11b", 0, 0},
+    {"r10", "r10b", 0, 0},
+    {"r9", "r9b", 0, 0},
+    {"r8", "r8b", 0, 0},
+    {"rcx", "cl", 0, 0},
+    {"rdx", "dl", 0, 0},
+    {"rsi", "sil", 0, 0},
+    {NULL, 0, 0}
+};
 
 NODEPTR_TYPE newNode(eOp op, NODEPTR_TYPE left, NODEPTR_TYPE right) {
     NODEPTR_TYPE node = calloc(1, sizeof(NODE_TYPE));
@@ -39,26 +50,53 @@ NODEPTR_TYPE newIdentNode(symbol_t *ident) {
     return node;
 }
 
-const char *getNextReg(const char *reg) {
+sRegister* newRegList(void) {
+    sRegister *list = (sRegister*)malloc(sizeof(regListTemplate));
+    memcpy((void*)list, (void*)regListTemplate, sizeof(regListTemplate));
+    return list;
+}
+
+static sRegister* _getNextReg(sRegister *list, const char *name) {
     int i;
-    const char *retval;
+    sRegister *startPos;
     
-    if(reg == NULL)
-        return regNames[0];
+    if(name == NULL) {
+        startPos=list;
+    } else {
+        for(i=0; list[i].name != NULL; i++) {
+            if(strcmp(list[i].name, name) == 0) {
+                startPos=&(list[i+1]);
+                break;
+            }
+        }
+        if(startPos == NULL)
+            return NULL;
+        if(startPos->name == NULL)
+            return NULL;
+    }
     
-    for(i=0; i<numRegs; i++) {
-        if(strcmp(reg,regNames[i]))
+    for(i=0; startPos[i].name != NULL; i++) {
+        if(startPos[i].isIdent)
             continue;
-        retval=regNames[i+1];
-        break;
+        
+        return &(startPos[i]);
     }
     
-    if(retval == NULL) {
-        printf("Failed to allocate register, aborting\n");
-        exit(4);
-    }
+
+    printf("Failed to allocate register, aborting\n");
+    exit(4);
     
-    return retval;
+    return NULL;
+}
+
+const char* getNextParamReg(sRegister *list) {
+    sRegister *reg = _getNextReg(list, NULL);
+    reg->isIdent=1;
+    return reg->name;
+}
+
+const char* getNextReg(sRegister *list, const char *regName) {
+    return _getNextReg(list, regName)->name;
 }
 
 static const char *getByteReg(const char *reg) {
@@ -67,9 +105,9 @@ static const char *getByteReg(const char *reg) {
     if(reg == NULL)
         return NULL;
     
-    for(i=0; regNames[i] != NULL; i++) {
-        if(strcmp(reg, regNames[i]) == 0)
-            return reg8Names[i];
+    for(i=0; regListTemplate[i].name != NULL; i++) {
+        if(strcmp(reg, regListTemplate[i].name) == 0)
+            return regListTemplate[i].byteName;
     }
     return NULL;
 }

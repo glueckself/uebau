@@ -54,10 +54,19 @@ struct _NodeType {
     const char *regname;
 };
 
+typedef struct {
+    char *name;
+    char *byteName;
+    int isIdent;
+    int usage;
+} sRegister;
+
 NODEPTR_TYPE newNode(eOp op, NODEPTR_TYPE left, NODEPTR_TYPE right);
 NODEPTR_TYPE newNumNode(int value);
 NODEPTR_TYPE newIdentNode(symbol_t *ident);
-const char* getNextReg(const char *reg);
+const char* getNextReg(sRegister *list, const char *regName);
+const char *getNextParamReg(sRegister *list);
+sRegister* newRegList(void);
 int nextIfLabelNum(void);
 
 void genNumFromIdent(const char *regname, symbol_t *sym);
