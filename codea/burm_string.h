@@ -13,6 +13,8 @@
 
 
 
+
+
 const char* burm_string[] = {
     "",
 "; fun: OP_CALL(expr)\n",
@@ -28,14 +30,11 @@ const char* burm_string[] = {
 "; listexpr: expr\n",
 
 "; numexpr: OP_ISNUM(expr) \n",
-"; numexpr: OP_ISNUM(numexpr)\n",
-"; numexpr: OP_ISNUM(imm)\n",
 "; numexpr: OP_ISLIST(expr)\n",
-"; numexpr: OP_ISLIST(numexpr) \n",
-"; numexpr: OP_ISLIST(imm) \n",
 "; numexpr: OP_ISFUN(expr) \n",
-"; numexpr: OP_ISFUN(numexpr)\n",
 "; numexpr: OP_ISFUN(imm)\n",
+"; numexpr: OP_ISNUM(imm)\n",
+"; numexpr: OP_ISLIST(imm) \n",
 "; numexpr: OP_PLUS(numexpr, numexpr)\n",
 "; numexpr: OP_PLUS(numexpr, imm)\n",
 "; numexpr: OP_PLUS(imm, numexpr)\n",
