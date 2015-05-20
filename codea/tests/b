@@ -22,13 +22,13 @@ LIST_EQUAL(b2(6), list);
 
 %%.0
 const sListElem list[] = {
-    {.type = ELEM_NUM, .head=6},
-    {.type = ELEM_NUM, .head=4},
-    {.type = ELEM_NUM, .head=7, .tail=5},
+    {.type = ELEM_NUM, .head=TAG_NUM(6)},
+    {.type = ELEM_NUM, .head=TAG_NUM(4)},
+    {.type = ELEM_NUM, .head=TAG_NUM(7), .tail=TAG_NUM(5)},
     {.type = ELEM_END}
 };
 
-LIST_EQUAL(b3(6), list);
+LIST_EQUAL(b3(TAG_NUM(6)), list);
 
 %%.0
 const sListElem list[] = {
