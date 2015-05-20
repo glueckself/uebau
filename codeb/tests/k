@@ -1,0 +1,46 @@
+k = fun x -> let y = x + 1 in y*2 end end;
+
+k1 = fun x -> let y = if x = 5
+                        then 1
+                        else 10
+                      end
+              in y*2
+              end
+end;
+
+k2 = fun x -> let y = if x = 5
+                        then 1
+                        else 10
+                      end
+              in y*x
+              end
+end;
+
+k3 = fun x -> let y = if x = 5
+                        then 1
+                        else 10
+                      end
+              in (y+1)*(x+1)
+              end
+end;
+
+%%.0
+RET(k(TAG_NUM(2)) == TAG_NUM(6));
+
+%%.0
+RET(k1(TAG_NUM(5)) == TAG_NUM(2));
+
+%%.0
+RET(k1(TAG_NUM(2)) == TAG_NUM(20));
+
+%%.0
+RET(k2(TAG_NUM(5)) == TAG_NUM(5));
+
+%%.0
+RET(k2(TAG_NUM(2)) == TAG_NUM(20));
+
+%%.0
+RET(k3(TAG_NUM(5)) == TAG_NUM(12));
+
+%%.0
+RET(k3(TAG_NUM(2)) == TAG_NUM(33));
