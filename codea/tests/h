@@ -1,3 +1,10 @@
 h = fun x -> x and 5 end;
 h1 = fun x -> x and (not x) end;
 h2 = fun x -> not x end;
+
+%%.0
+RET(h(TAG_NUM(0xf)) == TAG_NUM(5));
+
+%%.0
+RET(h(TAG_NUM(0xf0)) == TAG_NUM(0));
+
