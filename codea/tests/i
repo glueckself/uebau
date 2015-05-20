@@ -1,0 +1,4 @@
+i = fun x -> x+(x*(x+x))+(x*(x-((x*x)*(x-(x*x)))))+(x*(x+(x+2))) end;
+
+%%.0
+RET(i(TAG_NUM(10)) == TAG_NUM(90530)); 
