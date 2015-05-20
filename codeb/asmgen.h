@@ -45,6 +45,7 @@ typedef struct _NodeType *NODEPTR_TYPE;
 typedef struct _NodeType NODE_TYPE;
 struct _NodeType {
     NODEPTR_TYPE kids[2];
+    NODEPTR_TYPE parent;
     eOp op;
     STATEPTR_TYPE state;
     int labelNum;

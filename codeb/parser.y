@@ -98,9 +98,10 @@ Lambda:	FUN IDENT ARROW Expr END @{
 Expr: IF Expr THEN Expr ELSE Expr END @{
         @i @Expr.0.node@ = newNode(OP_IF, @Expr.1.node@, newNode(OP_CONDEVAL, @Expr.2.node@, @Expr.3.node@));
         
+        @t @Expr.2.node@->parent=@Expr.0.node@;
+        @t @Expr.3.node@->parent=@Expr.0.node@;
+        
         @reg @Expr.0.node@->labelNum = nextIfLabelNum();
-        @reg @Expr.2.node@->labelNum = @Expr.0.node@->labelNum;
-        @reg @Expr.3.node@->labelNum = @Expr.0.node@->labelNum;
         
         @reg @Expr.1.node@->regname = @Expr.0.node@->regname;
         @reg @Expr.2.node@->regname = @Expr.0.node@->regname;

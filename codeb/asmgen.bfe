@@ -18,11 +18,11 @@ expr: listexpr                        # 1 # genTagList(bnode->regname, kids[0]->
 expr: OP_HEAD(listexpr)               # 1 # genHead(bnode->regname, kids[0]->regname);
 expr: OP_TAIL(listexpr)               # 1 # genTail(bnode->regname, kids[0]->regname);
 expr: OP_IDENT                        # 1 # assignFromIdent(bnode->regname, bnode->ident->regname);
-expr: OP_IF(numexpr)                  # 1 # genIf(bnode->regname, bnode->val); burm_label(bnode->kids[1]); burm_reduce(bnode->kids[1],1);
+expr: OP_IF(numexpr)                  # 1 # genIf(bnode->regname, bnode->labelNum); burm_label(bnode->kids[1]); burm_reduce(bnode->kids[1],1);
 
 condeval: OP_CONDEVAL(thenexpr, elseexpr) # 0 #  
-thenexpr: expr                        # 0 # genElseLabel(bnode->regname, bnode->labelNum);
-elseexpr: expr                        # 0 # genEndIfLabel(bnode->regname, bnode->labelNum);
+thenexpr: expr                        # 0 # genElseLabel(bnode->regname, bnode->parent->labelNum);
+elseexpr: expr                        # 0 # genEndIfLabel(bnode->regname, bnode->parent->labelNum);
 
 listexpr: OP_DOT(expr, expr)          # 1 # genDot(bnode->regname, kids[0]->regname, kids[1]->regname);
 listexpr: OP_IDENT                    # 1 # genListFromIdent(bnode->regname, bnode->ident);
