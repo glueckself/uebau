@@ -1,10 +1,29 @@
 i = fun x -> x+(x*(x+x))+(x*(x-((x*x)*(x-(x*x)))))+(x*(x+(x+2))) end;
 i1 = fun x -> (head (x.1.x.(tail (2.x.3.x)))) end;
-i2 = fun x -> x.1.x.(tail (2.x.3.x)) end;
+i2 = fun x -> x.1.x.(tail tail tail (2.x.3.x)) end;
+i3 = fun x -> head ((x.x).x) end;
 
 %%.0
 RET(i(TAG_NUM(10)) == TAG_NUM(90530));
 
 %%.0
 RET(i1(TAG_NUM(5)) == TAG_NUM(5));
+
+%%.0
+const sListElem list[] = {
+  {.type=ELEM_NUM, .head=TAG_NUM(5)},
+  {.type=ELEM_NUM, .head=TAG_NUM(1)},
+  {.type=ELEM_NUM, .head=TAG_NUM(5), .tail=TAG_NUM(5)},
+  {.type=ELEM_END}
+};
+
+LIST_EQUAL(i2(TAG_NUM(5)), list);
+
+%%.0
+const sListElem list[] = {
+  {.type=ELEM_NUM, .head=5, .tail=5},
+  {.type=ELEM_END}
+};
+
+LIST_EQUAL(i3(5), list);
 
