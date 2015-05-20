@@ -11,11 +11,11 @@ j1 = fun x ->
                 else 25
              end
     end
-;
+end;
 
-j2 = fun x -> if (head x) = 10 then 1 else 15 end;
+j2 = fun x -> if (head x) = 10 then 1 else 15 end end;
 
-j3 = fun x -> if x = 5 then x + 2 else x - 1 end;
+j3 = fun x -> if x = 5 then x + 2 else x - 1 end end;
 
 %%.0
 RET(j(TAG_NUM(5)) == TAG_NUM(2));
