@@ -1,6 +1,7 @@
 h = fun x -> x and 5 end;
 h1 = fun x -> x and (not x) end;
 h2 = fun x -> not x end;
+h3 = fun x -> not 1 end;
 
 %%.0
 RET(h(TAG_NUM(0xf)) == TAG_NUM(5));
@@ -8,3 +9,11 @@ RET(h(TAG_NUM(0xf)) == TAG_NUM(5));
 %%.0
 RET(h(TAG_NUM(0xf0)) == TAG_NUM(0));
 
+%%.0
+RET(h1(TAG_NUM(7)) == TAG_NUM(6));
+
+%%.0
+RET(h2(TAG_NUM(2)) == TAG_NUM(3));
+
+%%.0
+RET(h3(TAG_NUM(0)) == TAG_NUM(0));
