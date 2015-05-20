@@ -35,7 +35,10 @@ typedef enum {
     OP_TAIL=13,
     OP_CALL=14,
     OP_IDENT=15,
-    OP_NUM=16
+    OP_NUM=16,
+    OP_EVAL=17,
+    OP_IF=18,
+    OP_CONDEVAL=19
 } eOp;
 
 typedef struct _NodeType *NODEPTR_TYPE;
@@ -44,6 +47,7 @@ struct _NodeType {
     NODEPTR_TYPE kids[2];
     eOp op;
     STATEPTR_TYPE state;
+    int labelNum;
     int val;
     symbol_t *ident;
     const char *regname;
@@ -52,7 +56,8 @@ struct _NodeType {
 NODEPTR_TYPE newNode(eOp op, NODEPTR_TYPE left, NODEPTR_TYPE right);
 NODEPTR_TYPE newNumNode(int value);
 NODEPTR_TYPE newIdentNode(symbol_t *ident);
-const char* getNextReg(const char *reg);    
+const char* getNextReg(const char *reg);
+int nextIfLabelNum(void);
 
 void genNumFromIdent(const char *regname, symbol_t *sym);
 void genNumFromReg(const char *dstReg, const char *srcReg);
@@ -82,4 +87,7 @@ void genTail(const char *dstReg, const char *srcReg);
 void assignFromIdent(const char *dstReg, const char *srcReg );
 void assignFromNum(const char *reg, long value);
 
+void genIf(const char *reg, int labelNum);
+void genElseLabel(const char *reg, int labelNum);
+void genEndIfLabel(const char *reg, int labelNum);
 #endif

@@ -1,0 +1,7 @@
+j = fun x -> if x = 5 then 2 else 1 end end;
+
+%%.0
+RET(j(TAG_NUM(5)) == TAG_NUM(2));
+
+%%.0
+RET(j(TAG_NUM(4)) == TAG_NUM(1));

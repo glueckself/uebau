@@ -248,4 +248,21 @@ void assignFromNum(const char *reg, long value) {
     printf("mov $%d, %%%s\n", value, reg);
 }
 
+void genIf(const char *reg, int labelNum) {
+    printf("cmp $0 %%%s\n", reg);
+    printf("jne elseLb%d\n", labelNum);
+}
 
+void genElseLabel(const char *reg, int labelNum) {
+    printf("jmp endifLb%d\n", labelNum);
+    printf("elseLb%d:\n", labelNum);
+}
+
+void genEndIfLabel(const char *reg, int labelNum) {
+    printf("endifLb%d:\n", labelNum);
+}
+
+int nextIfLabelNum(void) {
+    static int labelNum=0;
+    return labelNum++;
+}
