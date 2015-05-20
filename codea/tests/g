@@ -31,9 +31,8 @@ const long list[] = {0, 1};
 RET(g3(TAG_LIST(list)) == 1);
 
 %%.0
-RET(g4((TAG_NUM(5)) == TAG_NUM(2));
+RET(g4(TAG_NUM(5)) == TAG_NUM(2));
 
 %%.0
 const long list[] = {0, 1};
 RET(g4(TAG_LIST(list)) == TAG_NUM(2));
-
