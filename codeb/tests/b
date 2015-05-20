@@ -1,0 +1,40 @@
+b = fun x -> x.x end;
+b1 = fun x -> x.x.x end;
+b2 = fun x -> x.4.x end;
+b3 = fun x -> x.4.(x+1).5 end;
+
+%%.0
+const sListElem list[] = {
+    {.type = ELEM_NUM, .head=6, .tail=6},
+    {.type = ELEM_END}
+};
+
+LIST_EQUAL(b(6), list);
+
+%%.0
+const sListElem list[] = {
+    {.type = ELEM_NUM, .head=6},
+    {.type = ELEM_NUM, .head=TAG_NUM(4), .tail=6},
+    {.type = ELEM_END}
+};
+
+LIST_EQUAL(b2(6), list);
+
+%%.0
+const sListElem list[] = {
+    {.type = ELEM_NUM, .head=TAG_NUM(6)},
+    {.type = ELEM_NUM, .head=TAG_NUM(4)},
+    {.type = ELEM_NUM, .head=TAG_NUM(7), .tail=TAG_NUM(5)},
+    {.type = ELEM_END}
+};
+
+LIST_EQUAL(b3(TAG_NUM(6)), list);
+
+%%.0
+const sListElem list[] = {
+    {.type = ELEM_NUM, .head=8},
+    {.type = ELEM_NUM, .head=8, .tail=8},
+    {.type = ELEM_END}
+};
+
+LIST_EQUAL(b1(8), list);

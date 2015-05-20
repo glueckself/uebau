@@ -1,0 +1,10 @@
+i = fun x -> x+(x*(x+x))+(x*(x-((x*x)*(x-(x*x)))))+(x*(x+(x+2))) end;
+i1 = fun x -> (head (x.1.x.(tail (2.x.3.x)))) end;
+i2 = fun x -> x.1.x.(tail (2.x.3.x)) end;
+
+%%.0
+RET(i(TAG_NUM(10)) == TAG_NUM(90530));
+
+%%.0
+RET(i1(TAG_NUM(5)) == TAG_NUM(5));
+
