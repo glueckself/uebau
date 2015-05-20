@@ -207,7 +207,7 @@ void genEqual(const char *dstReg, const char *srcReg1, const char *srcReg2) {
 
 void genIsNum(const char *dstReg, const char *srcReg) {
     printf("sar $1, %%%s\n", srcReg);
-    printf("setnc %%%s\n", dstReg);
+    printf("setnc %%%s\n", getByteReg(dstReg));
     printf("and $1, %%%s\n", dstReg);
 }
 
