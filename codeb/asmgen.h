@@ -65,7 +65,7 @@ NODEPTR_TYPE newNode(eOp op, NODEPTR_TYPE left, NODEPTR_TYPE right);
 NODEPTR_TYPE newNumNode(int value);
 NODEPTR_TYPE newIdentNode(symbol_t *ident);
 const char* getNextReg(sRegister *list, const char *regName);
-const char *getNextParamReg(sRegister *list);
+const char *getNextParamReg(sRegister *list, const char *start);
 sRegister* newRegList(void);
 int nextIfLabelNum(void);
 

@@ -89,8 +89,8 @@ static sRegister* _getNextReg(sRegister *list, const char *name) {
     return NULL;
 }
 
-const char* getNextParamReg(sRegister *list) {
-    sRegister *reg = _getNextReg(list, NULL);
+const char* getNextParamReg(sRegister *list, const char *start) {
+    sRegister *reg = _getNextReg(list, start);
     reg->isIdent=1;
     return reg->name;
 }

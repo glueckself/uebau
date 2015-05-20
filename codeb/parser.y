@@ -93,7 +93,7 @@ Lambda:	FUN IDENT ARROW Expr END @{
             
             @t checkUnknownSymbol(@Lambda.sym@, @IDENT.val@);
             
-            @reg addSymbolStorage(@Expr.sym@, @IDENT.val@, getNextParamReg(@Lambda.regList@));
+            @reg addSymbolStorage(@Expr.sym@, @IDENT.val@, getNextParamReg(@Lambda.regList@, @Lambda.node@->regname));
             @reg @Expr.node@->regname = @Lambda.node@->regname;
         @}
       ;
