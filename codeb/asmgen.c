@@ -316,6 +316,6 @@ int nextIfLabelNum(void) {
 
 void genCallSymbol(const char *symName, const char *srcReg) {
     printf("pop %%r12\n");
-    printf("j %s\n", symName);
+    printf("jmp %s\n", symName);
 }
  
