@@ -1,5 +1,41 @@
 l = fun x -> x + 1 end;
 l1 = fun y -> l y end;
+l2 = fun y -> l (y+1) end;
+l3 = fun y -> if y = 0
+		 then l2 y
+		 else l1 y
+	      end
+     end
+;
+
+l4 = fun y -> if islist y
+		 then l3 (head y)
+		 else l3 y
+	      end
+     end
+;
 
 %%.0
 RET(l1(TAG_NUM(3)) == TAG_NUM(4));
+
+%%.0
+RET(l3(TAG_NUM(5)) == TAG_NUM(6));
+
+%%.0
+RET(l3(TAG_NUM(0)) == TAG_NUM(2));
+
+%%.0
+const long list[] = {3, 0};
+RET(l4(TAG_LIST(list)) == TAG_NUM(4));
+
+%%.0
+const long list[] = {0,0};
+RET(l4(TAG_LIST(list)) == TAG_NUM(2));
+
+%%.0
+RET(l4(TAG_NUM(0)) == TAG_NUM(2));
+
+%%.0
+RET(l4(TAG_NUM(15)) == TAG_NUM(16));
+
+
