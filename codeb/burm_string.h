@@ -22,6 +22,7 @@ const char* burm_string[] = {
 "; expr: OP_IDENT\n",
 "; expr: OP_IF\n",
 "; expr: OP_LET(expr)\n",
+"; expr: OP_CALL(ident)\n",
 
 "; condeval: OP_CONDEVAL(expr, expr)\n",
 "; thenexpr: expr\n",
@@ -42,7 +43,6 @@ const char* burm_string[] = {
 "; numexpr: OP_PLUS(imm, numexpr)\n",
 "; numexpr: OP_MINUS(numexpr, numexpr) \n",
 "; numexpr: OP_MINUS(numexpr, imm) \n",
-"; numexpr: OP_MINUS(imm, numexpr) \n",
 "; numexpr: OP_MULT(numexpr, numexpr)\n",
 "; numexpr: OP_MULT(numexpr, imm)\n",
 "; numexpr: OP_MULT(imm, numexpr)\n",
@@ -69,6 +69,8 @@ const char* burm_string[] = {
 "; imm: OP_ISFUN(imm) \n",
 "; imm: OP_ISLIST(imm)\n",
 "; imm: OP_NUM\n",
+
+"; ident: OP_IDENT\n",
 "UPDATE BURM_STRINGS!!!!!!!\n",
 "UPDATE BURM_STRINGS!!!!!!!\n",
 "UPDATE BURM_STRINGS!!!!!!!\n",

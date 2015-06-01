@@ -75,7 +75,7 @@ Program: Def SEMICOLON @{
 Def: IDENT EQUAL Lambda @{
         @i @Lambda.sym@ = addSymbol(@Def.globSym@, @IDENT.val@);
         @i @Def.globVal@ = @IDENT.val@;
-        @i @Def.node@ = newNode(OP_CALL, @Lambda.node@, NULL);
+        @i @Def.node@ = newNode(OP_EVAL, @Lambda.node@, NULL);
         
         @t checkGlobalSymbol(@Def.globSym@, @IDENT.val@);
         
@@ -83,7 +83,6 @@ Def: IDENT EQUAL Lambda @{
         
         @codegen genSymbol(@IDENT.val@);
         @codegen burm_label(@Def.node@); burm_reduce(@Def.node@, 1);
-        
      @}
    ;
 
@@ -122,21 +121,11 @@ Expr: IF Expr THEN Expr ELSE Expr END @{
           @reg @Expr.1.node@->regname = getNextParamReg(@Expr.regList@, @Expr.0.node@->regname); addSymbolStorage(@Expr.2.sym@, @IDENT.val@, @Expr.1.node@->regname);
           @reg @Expr.2.node@->regname = @Expr.0.node@->regname;
       @}
-    | EExpr @{
-          @i @Expr.node@ = @EExpr.node@;
-      @}
-    | AddTerm @{
-          @i @Expr.node@ = @AddTerm.node@;
-      @}
-    | MultTerm @{
-          @i @Expr.node@ = @MultTerm.node@;
-      @}
-    | AndTerm @{
-          @i @Expr.node@ = @AndTerm.node@;
-      @}
-    | DotTerm @{
-          @i @Expr.node@ = @DotTerm.node@;
-      @}
+    | EExpr
+    | AddTerm
+    | MultTerm
+    | AndTerm
+    | DotTerm
     | Term MINUS Term @{
           @i @Expr.node@ = newNode(OP_MINUS, @Term.0.node@, @Term.1.node@);
           
@@ -155,15 +144,14 @@ Expr: IF Expr THEN Expr ELSE Expr END @{
           @reg @Term.0.node@->regname = @Expr.node@->regname;
           @reg @Term.1.node@->regname = getNextReg(@Expr.regList@, @Expr.node@->regname);
       @}
-    | Expr Term @{ @i @Expr.0.node@ = NULL; @}
+    | Expr Term @{
+	  @i @Expr.0.node@ = newNode(OP_CALL, @Term.node@, @Expr.1.node@);
+	  @reg @Term.node@->regname = "rdi";
+      @}
     ;
 
-EExpr: Term @{
-          @i @EExpr.node@ = @Term.node@;
-       @}
-     | KExpr @{
-          @i @EExpr.node@ = @KExpr.node@;
-       @}
+EExpr: Term
+     | KExpr
      ;
 
 KExpr: NOT EExpr @{
@@ -254,7 +242,7 @@ DotTerm: Term DOT Term @{
          @}
        ;
 
-Term: LBRACKET Expr RBRACKET @{ @i @Term.node@ = @Expr.node@; @}
+Term: LBRACKET Expr RBRACKET
     | NUM @{
         @i @Term.node@ = newNumNode(@NUM.val@);
       @}

@@ -101,4 +101,6 @@ void assignFromNum(const char *reg, long value);
 void genIf(const char *reg, int labelNum);
 void genElseLabel(const char *reg, int labelNum);
 void genEndIfLabel(const char *reg, int labelNum);
+
+void genCallSymbol(const char *symName, const char *srcReg);
 #endif

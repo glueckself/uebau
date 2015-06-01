@@ -5,11 +5,11 @@
 #endif
 %}
 
-%term OP_PLUS=1 OP_MINUS=2 OP_MULT=3 OP_AND=4 OP_NOT=5 OP_LESS=6 OP_EQUAL=7 OP_ISNUM=8 OP_ISLIST=9 OP_ISFUN=10 OP_DOT=11 OP_HEAD=12 OP_TAIL=13 OP_CALL=14 OP_IDENT=15 OP_NUM=16 OP_IF=18 OP_CONDEVAL=19 OP_LET=20
+%term OP_PLUS=1 OP_MINUS=2 OP_MULT=3 OP_AND=4 OP_NOT=5 OP_LESS=6 OP_EQUAL=7 OP_ISNUM=8 OP_ISLIST=9 OP_ISFUN=10 OP_DOT=11 OP_HEAD=12 OP_TAIL=13 OP_CALL=14 OP_IDENT=15 OP_NUM=16 OP_EVAL=17 OP_IF=18 OP_CONDEVAL=19 OP_LET=20
 
 %%
 
-eval: OP_CALL(expr)                   # 0 # genReturn(bnode->regname, kids[0]->regname);
+eval: OP_EVAL(expr)                   # 0 # genReturn(bnode->regname, kids[0]->regname);
 eval: expr                            # 0 # assignFromIdent(bnode->regname, kids[0]->regname);
 eval: condeval                        # 0 # 
 
@@ -18,8 +18,9 @@ expr: listexpr                        # 1 # genTagList(bnode->regname, kids[0]->
 expr: OP_HEAD(listexpr)               # 1 # genHead(bnode->regname, kids[0]->regname);
 expr: OP_TAIL(listexpr)               # 1 # genTail(bnode->regname, kids[0]->regname);
 expr: OP_IDENT                        # 1 # assignFromIdent(bnode->regname, bnode->ident->regname);
-expr: OP_IF(numexpr)                  # 1 # genIf(bnode->regname, bnode->labelNum); burm_label(bnode->kids[1]); burm_reduce(bnode->kids[1],1);
+expr: OP_IF(expr)                     # 1 # genIf(bnode->regname, bnode->labelNum); burm_label(bnode->kids[1]); burm_reduce(bnode->kids[1],1);
 expr: OP_LET(expr)                    # 1 # burm_label(bnode->kids[1]); burm_reduce(bnode->kids[1], 1);
+expr: OP_CALL(expr, ident)	      # 1 # genCallSymbol(kids[1]->ident->name, kids[0]->regname);
 
 condeval: OP_CONDEVAL(thenexpr, elseexpr) # 0 #  
 thenexpr: expr                        # 0 # genElseLabel(bnode->regname, bnode->parent->labelNum);
@@ -40,7 +41,6 @@ numexpr: OP_PLUS(numexpr, imm)        # 1 # genAddI(bnode->regname, kids[0]->reg
 numexpr: OP_PLUS(imm, numexpr)        # 1 # genAddI(bnode->regname, kids[1]->regname, kids[0]->val);
 numexpr: OP_MINUS(numexpr, numexpr)   # 2 # genMinus(bnode->regname,kids[0]->regname, kids[1]->regname);
 numexpr: OP_MINUS(numexpr, imm)       # 1 # genMinusI(bnode->regname,kids[0]->regname, kids[1]->val);
-numexpr: OP_MINUS(imm, numexpr)       # 1 # genMinusI(bnode->regname,kids[1]->regname, kids[0]->val);
 numexpr: OP_MULT(numexpr, numexpr)    # 2 # genMult(bnode->regname,kids[0]->regname, kids[1]->regname);
 numexpr: OP_MULT(numexpr, imm)        # 1 # genMultI(bnode->regname,kids[0]->regname, kids[1]->val);
 numexpr: OP_MULT(imm, numexpr)        # 1 # genMultI(bnode->regname,kids[1]->regname, kids[0]->val);
@@ -67,5 +67,7 @@ imm: OP_ISNUM(imm)           # 0 # bnode->val = 1;
 imm: OP_ISFUN(imm)           # 0 # bnode->val = 0;
 imm: OP_ISLIST(imm)          # 0 # bnode->val = 0;
 imm: OP_NUM                  # 0
+
+ident:	OP_IDENT		# 0 #
 
 %%

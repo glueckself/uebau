@@ -149,9 +149,9 @@ void genTagNum(const char *dstReg, const char *srcReg) {
 }
 
 static void extractList(const char *reg) {
-    printf("mov $3, %r12\n");
-    printf("and %%%s, %r12\n", reg);
-    printf("cmp $1, %r12\n");
+    printf("mov $3, %%r12\n");
+    printf("and %%%s, %%r12\n", reg);
+    printf("cmp $1, %%r12\n");
     printf("jne raisesig\n");
     printf("sub $1, %%%s\n", reg);
 }
@@ -185,13 +185,13 @@ void genSymbol(const char *fName) {
     printf(".globl %s\n", fName);
     printf("\t.type %s, @function\n", fName);
     printf("%s:\n",fName);
-    printf("pushq %r12\n");
+    printf("pushq %%r12\n");
 }
 
 void genReturn(const char *dstReg, const char *srcReg) {
     if(dstReg != NULL && srcReg != NULL)
         move(dstReg, srcReg);
-    printf("pop %r12\n");
+    printf("pop %%r12\n");
     printf("ret\n\n");
 }
 
@@ -202,7 +202,7 @@ void genAdd(const char *dstReg, const char *srcReg1, const char *srcReg2) {
 
 void genAddI(const char *dstReg, const char *srcReg, const long value) {
     move(dstReg, srcReg);
-    printf("add $%d, %%%s\n", value, dstReg);
+    printf("add $%ld, %%%s\n", value, dstReg);
 }
 
 void genMinus(const char *dstReg, const char *srcReg1, const char *srcReg2) {
@@ -212,7 +212,7 @@ void genMinus(const char *dstReg, const char *srcReg1, const char *srcReg2) {
 
 void genMinusI(const char *dstReg, const char *srcReg, const long value) {
     move(dstReg, srcReg);
-    printf("sub $%d, %%%s\n", value, dstReg);
+    printf("sub $%ld, %%%s\n", value, dstReg);
 }
     
 void genMult(const char *dstReg, const char *srcReg1, const char *srcReg2) {
@@ -222,7 +222,7 @@ void genMult(const char *dstReg, const char *srcReg1, const char *srcReg2) {
 
 void genMultI(const char *dstReg, const char *srcReg, const long value) {
     move(dstReg, srcReg);
-    printf("imul $%d, %%%s\n", value, dstReg);
+    printf("imul $%ld, %%%s\n", value, dstReg);
 }
 
 void genAnd(const char *dstReg, const char *srcReg1, const char *srcReg2) {
@@ -232,7 +232,7 @@ void genAnd(const char *dstReg, const char *srcReg1, const char *srcReg2) {
 
 void genAndI(const char *dstReg, const char *srcReg, const long value) {
     move(dstReg, srcReg);
-    printf("and $%d, %%%s\n", value, dstReg);
+    printf("and $%ld, %%%s\n", value, dstReg);
 }
 
 void genNot(const char *dstReg, const char *srcReg) {
@@ -259,9 +259,9 @@ void genIsNum(const char *dstReg, const char *srcReg) {
 }
 
 void genIsList(const char *dstReg, const char *srcReg) {
-    printf("mov $3, %r12\n");
-    printf("and %%%s, %r12\n", srcReg);
-    printf("cmp $1, %r12\n");
+    printf("mov $3, %%r12\n");
+    printf("and %%%s, %%r12\n", srcReg);
+    printf("cmp $1, %%r12\n");
     printf("sete %%%s\n", getByteReg(dstReg));
     printf("and $1, %%%s\n", dstReg);
 }
@@ -273,10 +273,10 @@ void genIsFun(const char *dstReg, const char *srcReg) {
 }
 
 void genDot(const char *dstReg, const char *srcReg, const char *srcReg2) {
-    printf("mov %%%s, 0(%r15)\n", srcReg);
-    printf("mov %%%s, 8(%r15)\n", srcReg2);
-    printf("mov %r15, %%%s\n", dstReg);
-    printf("add $16, %r15\n");
+    printf("mov %%%s, 0(%%r15)\n", srcReg);
+    printf("mov %%%s, 8(%%r15)\n", srcReg2);
+    printf("mov %%r15, %%%s\n", dstReg);
+    printf("add $16, %%r15\n");
 }
 
 void genHead(const char *dstReg, const char *srcReg) {
@@ -292,7 +292,7 @@ void assignFromIdent(const char *dstReg, const char *srcReg ) {
 }
 
 void assignFromNum(const char *reg, long value) {
-    printf("mov $%d, %%%s\n", value, reg);
+    printf("mov $%ld, %%%s\n", value, reg);
 }
 
 void genIf(const char *reg, int labelNum) {
@@ -313,3 +313,9 @@ int nextIfLabelNum(void) {
     static int labelNum=0;
     return labelNum++;
 }
+
+void genCallSymbol(const char *symName, const char *srcReg) {
+    printf("pop %%r12\n");
+    printf("j %s\n", symName);
+}
+ 
