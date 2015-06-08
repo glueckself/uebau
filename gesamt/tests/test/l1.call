@@ -1,3 +1,0 @@
-#include "helper.h"
-
-RET(l1(TAG_NUM(3)) == TAG_NUM(4));

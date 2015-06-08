@@ -1,4 +1,0 @@
-#include "helper.h"
-
-RET(f(10) == -4);
-
