@@ -16,8 +16,8 @@ end;
 sum3 = fun x -> sum2 (0.x) end;
 sum2 = fun x ->
   if tail x then
-    let y = tail x in
-      sum1 ((head x)+(head y)).(tail y)
+    let y = (tail x) in
+      sum1 (((head x)+(head y)).(tail y))
     end
   else
     head x
