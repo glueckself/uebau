@@ -1,0 +1,4 @@
+#include "helper.h"
+
+RET(f(6) == 0);
+

@@ -1,0 +1,4 @@
+
+l = fun x -> x + 1 end;
+l1 = fun y -> l y end;
+

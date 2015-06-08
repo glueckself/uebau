@@ -1,0 +1,14 @@
+d = fun x -> x < 5 end;
+d1 = fun x -> (x-5) < 6 end;
+
+%%.0
+RET(d(TAG_NUM(3)) == TAG_NUM(1));
+
+%%.0
+RET(d(TAG_NUM(6)) == TAG_NUM(0));
+
+%%.0
+RET(d1(TAG_NUM(6)) == TAG_NUM(1));
+
+%%.0
+RET(d1(TAG_NUM(20)) == TAG_NUM(0));
