@@ -145,8 +145,8 @@ Expr: IF Expr THEN Expr ELSE Expr END @{
           @reg @Term.1.node@->regname = getNextReg(@Expr.regList@, @Expr.node@->regname);
       @}
     | Expr Term @{
-	  @i @Expr.0.node@ = newNode(OP_CALL, @Term.node@, @Expr.1.node@);
-	  @reg @Term.node@->regname = "rdi";
+	  @i @Expr.0.node@ = newNode(OP_CALL, @Expr.1.node@,  @Term.node@);
+	  @reg @Term.node@->regname = getNextReg(@Expr.regList@, @Expr.node@->regname);
       @}
     ;
 

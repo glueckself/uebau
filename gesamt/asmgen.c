@@ -242,7 +242,7 @@ void genNot(const char *dstReg, const char *srcReg) {
 
 void genLess(const char *dstReg, const char *srcReg1, const char *srcReg2) {
     printf("cmp %%%s, %%%s\n", srcReg2, srcReg1);
-    printf("setc %%%s\n", getByteReg(dstReg));
+    printf("setl %%%s\n", getByteReg(dstReg));
     printf("and $1, %%%s\n", dstReg);
 }
 
@@ -315,6 +315,7 @@ int nextIfLabelNum(void) {
 }
 
 void genCallSymbol(const char *symName, const char *srcReg) {
+    move("%%%rdi, %%%s", srcReg);
     printf("pop %%r12\n");
     printf("jmp %s\n", symName);
 }
