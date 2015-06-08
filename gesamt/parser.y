@@ -248,6 +248,7 @@ Term: LBRACKET Expr RBRACKET
       @}
     | IDENT @{
         @t checkKnownSymbol(@Term.sym@, @IDENT.val@);
+        @reg if(@Term.node@->ident == NULL) { @Term.node@->ident = lookupSymbol(@Term.sym@, @IDENT.val@);}
         @i @Term.node@ = newIdentNode(lookupSymbol(@Term.sym@, @IDENT.val@));
       @}
     ;
