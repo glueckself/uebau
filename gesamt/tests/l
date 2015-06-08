@@ -10,7 +10,7 @@ l3 = fun y -> if y = 0
 
 l4 = fun y -> if islist y
 		 then l3 (head y)
-		 else l3 (l5 y)
+		 else l3 y
 	      end
      end
 ;
