@@ -74,13 +74,13 @@ const long list2[] = {TAG_NUM(3), 0};
 const long list1[] = {TAG_NUM(1),TAG_LIST(list2)};
 const long list[] = {TAG_NUM(1),TAG_LIST(list1)};
 
-RET(sum3(TAG_LIST(list)) == 5);
+RET(sum3(TAG_LIST(list)) == TAG_NUM(5));
 
 %%.0
 const long list2[] = {TAG_NUM(3), 0};
 const long list1[] = {TAG_NUM(1),TAG_LIST(list2)};
 const long list[] = {TAG_NUM(-2),TAG_LIST(list1)};
 
-RET(sum(TAG_LIST(list)) == 2);
+RET(sum(TAG_LIST(list)) == TAG_NUM(2));
 
 
