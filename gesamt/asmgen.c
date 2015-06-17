@@ -143,7 +143,7 @@ static void saveIdentifiers(symbol_t *sym) {
     for(e=sym; e != NULL; e=e->next) {
         if(e->offset == -1)
             continue;
-        printf("mov %%%s, %d(%%rsp)\n", e->regname, e->offset);
+        printf("movq %%%s, %d(%%rsp)\n", e->regname, 0-8-e->offset);
         varCnt++;
     }
     printf("sub $%d, %%rsp\n", varCnt*8);
@@ -155,7 +155,7 @@ static void restoreIdentifiers(symbol_t *sym) {
     for(e=sym; e != NULL; e=e->next) {
         if(e->offset == -1)
             continue;
-        printf("mov %d(%%rsp), %%%s\n", e->offset, e->regname);
+        printf("movq %d(%%rsp), %%%s\n", e->offset, e->regname);
         varCnt++;
     }
     printf("add $%d, %%rsp\n", varCnt*8);
@@ -249,7 +249,7 @@ void genLabel(const char *fName) {
 void genReturn(const char *dstReg, const char *srcReg) {
     if(dstReg != NULL && srcReg != NULL)
         move(dstReg, srcReg);
-    printf("pop %%r12\n");
+    printf("popq %%r12\n");
     printf("ret\n\n");
 }
 
@@ -432,7 +432,7 @@ void genClosureCall(const char *dstReg, const char *clsrReg, symbol_t *sym, cons
     saveIdentifiers(sym);
     move("rdi", srcReg);
     printf("mov 8(%%%s), %%r12\n", clsrReg);
-    printf("call *%%%s\n", clsrReg);
+    printf("call *(%%%s)\n", clsrReg);
     move(dstReg, "rax");
     restoreIdentifiers(sym);
 }
