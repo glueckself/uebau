@@ -9,9 +9,11 @@
 
 #define ENABLE_OPT_TYPECHECK 0
 
+const symbol_t raxReg = {0};
+
 const sRegister regListTemplate[] = {
-    {"rax", "al", NULL, 1},
-    {"rdi", "dil", NULL, 1},
+    {"rax", "al", (symbol_t*)&raxReg, 1},
+    {"rdi", "dil", (symbol_t*)&raxReg, 1},
     {"r11", "r11b", NULL, 0},
     {"r10", "r10b", NULL, 0},
     {"r9", "r9b", NULL, 0},
@@ -412,6 +414,7 @@ const char* labelNameFromNum(const char *prefix, int num) {
 
 void restoreEnvironment(sRegister *regList, symbol_t *list) {
   symbol_t *e;
+  const char *reg=NULL;
   
  // printf("restore environment\n");
   
@@ -419,7 +422,8 @@ void restoreEnvironment(sRegister *regList, symbol_t *list) {
     if(e->offset == -1)
       continue;
     
-    assignIdentToReg(regList, getNextReg(regList, NULL), e);
+    reg=getNextReg(regList,reg);
+    assignIdentToReg(regList, reg, e);
     
     printf("mov %d(%%r12), %%%s\n", e->offset, e->regname);
   }
