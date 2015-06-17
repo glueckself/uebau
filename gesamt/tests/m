@@ -1,0 +1,39 @@
+m = fun x ->
+  let f =
+    fun y ->
+      y+x
+    end
+  in
+    f 3
+  end
+end;
+
+m1 = fun x ->
+  if x > 0
+  then
+    fun y -> x*y end
+  else
+    fun y -> x+y end
+  end
+end;
+
+m2 = fun x -> m1 x end;
+
+m3 = fun x -> (m2 x) 2 end;
+
+m4 = fun x ->
+  let x1 = x+1 in
+    fun y -> x1+x+y end
+  end
+end;
+
+m5 = fun x -> (m4 2) x end;
+
+%%.0
+RET(m5(TAG_NUM(5)) == TAG_NUM(10));
+
+%%.0
+RET(m3(TAG_NUM(4)) == TAG_NUM(8));
+
+%%.0
+RET(m(TAG_NUM(10)) == TAG_NUM(13));
