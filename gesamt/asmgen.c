@@ -348,10 +348,22 @@ int nextIfLabelNum(void) {
     return labelNum++;
 }
 
-void genCallSymbol(const char *dstReg, const char *symName, const char *srcReg) {
+void genCallSymbol(const char *dstReg, symbol_t *sym, const char *srcReg) {
+    int varCnt=0;
+    symbol_t *e;
+    for(e=sym; e != NULL; e=e->next)  {
+        printf("mov %%%s, %d(%%rsp)", e->regname, e->offset);
+        varCnt++;
+    }
+    printf("sub $d, %%rsp\n", varCnt*8);
+
     move("rdi", srcReg);
     printf("call %s\n", symName);
     move(dstReg, "rax");
+
+    for(e=sym; e != NULL; e=e->next)
+        printf("mov %d(%%rsp), %%%s", e->offset, e->regname);
+    printf("add $d, %%rsp\n", varCnt*8);
 }
 
 void genClosure(const char *dstReg, const char *label, symbol_t *symbols) {
@@ -402,11 +414,22 @@ void restoreEnvironment(sRegister *regList, symbol_t *list) {
 }
 
 
-void genClosureCall(const char *dstReg, const char *clsrReg, const char *srcReg) {
+void genClosureCall(const char *dstReg, const char *clsrReg, symbol_t *sym, const char *srcReg) {
+    int varCnt=0;
+    for(e=sym; e != NULL; e=e->next) {
+        printf("mov %%%s, %d(%%rsp)", e->regname, e->offset);
+        varCnt++;
+    }
+    printf("sub $d, %%rsp\n", varCnt*8);
+
     move("rdi", srcReg);
     printf("mov 8(%%%s), %%r12\n", clsrReg);
     printf("call *%%%s\n", clsrReg);
     move(dstReg, "rax");
+
+    for(e=sym; e != NULL; e=e->next) 
+        printf("mov %%%s, %d(%%rsp)", e->regname, e->offset);
+    printf("add $d, %%rsp\n", varCnt*8);
 }
 
 

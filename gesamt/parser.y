@@ -164,6 +164,7 @@ Expr: IF Expr THEN Expr ELSE Expr END @{
 	  //if expr is 
 	  @reg @Term.node@->regname = getNextReg(@Expr.regList@, @Expr.node@->regname);
 	  @reg @Expr.1.node@->regname = @Expr.node@->regname;
+      @reg @Expr.1.node@->ident = @Expr.sym@;
       @}
     ;
 

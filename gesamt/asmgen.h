@@ -113,8 +113,8 @@ void genEndIfLabel(const char *reg, int labelNum);
 void genClosure(const char *dstReg, const char *label, symbol_t *symbols);
 void genTagFunc(const char *dstReg, const char *srcReg);
 void restoreEnvironment(sRegister *regList, symbol_t *list);
-void genClosureCall(const char *dstReg, const char *clsrReg, const char *srcReg);
+void genClosureCall(const char *dstReg, const char *clsrReg, symbol_t *sym, const char *srcReg);
 void genClosureFromReg(const char *dstReg, const char *srcReg);
 
-void genCallSymbol(const char *dstReg, const char *symName, const char *srcReg);
+void genCallSymbol(const char *dstReg, symbol_t *sym, const char *srcReg);
 #endif
