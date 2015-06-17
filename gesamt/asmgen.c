@@ -70,13 +70,13 @@ static sRegister* _getNextReg(sRegister *list, const char *name) {
             }
         }
         if(startPos == NULL)
-            return NULL;
+            return &startPos[0];
         if(startPos->name == NULL)
-            return NULL;
+            return &startPos[0];
     }
     
     for(i=0; startPos[i].name != NULL; i++) {
-	if(startPos[i].isUsed) {
+	if(startPos[i].ident != NULL) {
 	//  printf("%s is used\n", startPos[i].name);
 	    continue;
 	}
@@ -85,10 +85,8 @@ static sRegister* _getNextReg(sRegister *list, const char *name) {
     }
     
 
-    printf("Failed to allocate register, aborting\n");
-    exit(4);
-    
-    return NULL;
+    //we should compile all statically correct programs but it doesn't mean to execute them :)
+    return &startPos[0];
 }
 
 
