@@ -15,6 +15,7 @@ struct symbol_t {
 	char *name;
         eSymType type;
         const char *regname;
+	int offset;
 };
 
 void checkKnownSymbol(symbol_t *list, char *name);

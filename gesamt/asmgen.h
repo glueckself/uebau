@@ -39,7 +39,8 @@ typedef enum {
     OP_EVAL=17,
     OP_IF=18,
     OP_CONDEVAL=19,
-    OP_LET=20
+    OP_LET=20,
+    OP_CLOSURE=21
 } eOp;
 
 typedef struct _NodeType *NODEPTR_TYPE;
@@ -53,22 +54,28 @@ struct _NodeType {
     int val;
     symbol_t *ident;
     const char *regname;
+    const char *name;
 };
 
 typedef struct {
     char *name;
     char *byteName;
-    int isIdent;
-    int usage;
+    symbol_t *ident;
+    int isUsed;
+    eSymType type;
 } sRegister;
 
 NODEPTR_TYPE newNode(eOp op, NODEPTR_TYPE left, NODEPTR_TYPE right);
 NODEPTR_TYPE newNumNode(int value);
 NODEPTR_TYPE newIdentNode(symbol_t *ident);
 const char* getNextReg(sRegister *list, const char *regName);
-const char *getNextParamReg(sRegister *list, const char *start);
+const char* getResultReg();
+const char* getParamReg();
+void assignIdentToReg(sRegister *list, const char *reg, symbol_t *ident);
+
 sRegister* newRegList(void);
 int nextIfLabelNum(void);
+const char* labelNameFromNum(const char *prefix, int num);
 
 void genNumFromIdent(const char *regname, symbol_t *sym);
 void genNumFromReg(const char *dstReg, const char *srcReg);
@@ -77,6 +84,7 @@ void genListFromIdent(const char *regname, symbol_t *sym);
 void genListFromReg(const char *dstReg, const char *srcReg);
 void genTagList(const char *dstReg, const char *srcReg);
 void genSymbol(const char *fName);
+void genLabel(const char *fName);
 void genReturn(const char *dstReg, const char *srcReg);
 void genAdd(const char *dstReg, const char *srcReg1, const char *srcReg2);
 void genAddI(const char *dstReg, const char *srcReg, const long value);
@@ -102,5 +110,10 @@ void genIf(const char *reg, int labelNum);
 void genElseLabel(const char *reg, int labelNum);
 void genEndIfLabel(const char *reg, int labelNum);
 
-void genCallSymbol(const char *symName, const char *srcReg);
+void genClosure(const char *dstReg, const char *label, symbol_t *symbols);
+void genTagFunc(const char *dstReg, const char *srcReg);
+void restoreEnvironment(sRegister *regList, symbol_t *list);
+void genClosureCall(const char *dstReg, const char *clsrReg, const char *srcReg);
+
+void genCallSymbol(const char *dstReg, const char *symName, const char *srcReg);
 #endif

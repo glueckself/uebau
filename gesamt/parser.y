@@ -46,7 +46,7 @@
 @attributes {unsigned int val;} NUM
 @attributes {char *val;}        IDENT
 @attributes {symbol_t *globSym;} Program
-@attributes {symbol_t *globSym; char *globVal; NODEPTR_TYPE node; sRegister *regList;} Def
+@attributes {symbol_t *globSym; char *globVal; NODEPTR_TYPE node;} Def
 @attributes {symbol_t *sym; NODEPTR_TYPE node; sRegister *regList; } Lambda Expr EExpr KExpr AddTerm MultTerm DotTerm AndTerm Term
 
 @traversal @postorder t
@@ -61,39 +61,44 @@ File:
 Program: Def SEMICOLON @{
              @i @Program.globSym@ = mkList(@Def.globVal@);
              @i @Def.globSym@ = @Program.globSym@;
-             @i @Def.regList@ = newRegList();
          @}
 /*       | @{ @i @Program.globSym@ = NULL; @}*/
        | Program Def SEMICOLON @{
              @i @Program.globSym@ = addGlobalSymbol(@Program.1.globSym@, @Def.globVal@);
              @i @Def.globSym@ = @Program.globSym@;
-             @i @Def.regList@ = newRegList();
          @}
        ;
 
        //DefIdent überall sichtbar
 Def: IDENT EQUAL Lambda @{
-        @i @Lambda.sym@ = addSymbol(@Def.globSym@, @IDENT.val@);
+        @i @Lambda.sym@ = @Def.globSym@;
         @i @Def.globVal@ = @IDENT.val@;
-        @i @Def.node@ = newNode(OP_EVAL, @Lambda.node@, NULL);
+	@i @Lambda.regList@ = newRegList();
         
         @t checkGlobalSymbol(@Def.globSym@, @IDENT.val@);
         
-        @reg @Lambda.node@->regname = getNextReg(@Def.regList@, NULL);
+        @reg @Lambda.node@->name = @IDENT.val@;
+        @reg @Lambda.node@->labelNum = -1;
         
-        @codegen genSymbol(@IDENT.val@);
-        @codegen burm_label(@Def.node@); burm_reduce(@Def.node@, 1);
+        @codegen @revorder(1) genSymbol(@IDENT.val@);
      @}
    ;
 
 	//DefIdent in expr sichtbar
 Lambda:	FUN IDENT ARROW Expr END @{
             @i @Expr.sym@ = addSymbol(@Lambda.sym@, @IDENT.val@);
-            
+	    @i @Lambda.node@ = newNode(OP_EVAL, @Expr.node@, NULL);
+	    
             @t checkUnknownSymbol(@Lambda.sym@, @IDENT.val@);
             
-            @reg addSymbolStorage(@Expr.sym@, @IDENT.val@, getNextParamReg(@Lambda.regList@, @Lambda.node@->regname));
+            @reg assignIdentToReg(@Lambda.regList@, getParamReg(), @Expr.sym@);
+
+	    @reg @Lambda.node@->regname = getResultReg();
             @reg @Expr.node@->regname = @Lambda.node@->regname;
+            
+	    @codegen genLabel(@Lambda.node@->name);
+	    @codegen if(@Lambda.node@->labelNum >= 0) restoreEnvironment(@Lambda.regList@, @Lambda.sym@);
+	    @codegen burm_label(@Lambda.node@); burm_reduce(@Lambda.node@, 1);
         @}
       ;
 
@@ -110,7 +115,15 @@ Expr: IF Expr THEN Expr ELSE Expr END @{
         @reg @Expr.3.node@->regname = @Expr.0.node@->regname;
         
       @} 
-    | Lambda
+    | Lambda @{
+	@i @Expr.node@ = newNode(OP_CLOSURE, @Lambda.node@, NULL);
+	@i @Lambda.regList@ = newRegList();
+	@i @Lambda.sym@ = copyList(@Expr.sym@);
+	
+	@reg @Lambda.node@->labelNum = nextIfLabelNum();
+	@reg @Lambda.node@->name = labelNameFromNum("lambda",@Lambda.node@->labelNum);
+	@reg @Expr.node@->ident = @Expr.sym@;
+    @}
     | LET IDENT EQUAL Expr IN Expr END @{ 
           @i @Expr.2.sym@ = addSymbol(@Expr.0.sym@, @IDENT.val@);
           @i @Expr.0.node@ = newNode(OP_LET, @Expr.1.node@, @Expr.2.node@);
@@ -118,7 +131,8 @@ Expr: IF Expr THEN Expr ELSE Expr END @{
           @t checkUnknownSymbol(@Expr.1.sym@, @IDENT.val@);
           @t checkUnknownSymbol(@Expr.0.sym@, @IDENT.val@); 
           
-          @reg @Expr.1.node@->regname = getNextParamReg(@Expr.regList@, @Expr.0.node@->regname); addSymbolStorage(@Expr.2.sym@, @IDENT.val@, @Expr.1.node@->regname);
+          @reg @Expr.1.node@->regname = getNextReg(@Expr.regList@, @Expr.0.node@->regname);
+          @reg assignIdentToReg(@Expr.regList@, @Expr.1.node@->regname, @Expr.2.sym@);
           @reg @Expr.2.node@->regname = @Expr.0.node@->regname;
       @}
     | EExpr
@@ -146,7 +160,10 @@ Expr: IF Expr THEN Expr ELSE Expr END @{
       @}
     | Expr Term @{
 	  @i @Expr.0.node@ = newNode(OP_CALL, @Expr.1.node@,  @Term.node@);
+	  
+	  //if expr is 
 	  @reg @Term.node@->regname = getNextReg(@Expr.regList@, @Expr.node@->regname);
+	  @reg @Expr.1.node@->regname = @Expr.node@->regname;
       @}
     ;
 

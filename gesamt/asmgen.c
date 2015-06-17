@@ -10,16 +10,16 @@
 #define ENABLE_OPT_TYPECHECK 0
 
 const sRegister regListTemplate[] = {
-    {"rax", "al", 0, 0},
-    {"rdi", "dil", 0, 0},
-    {"r11", "r11b", 0, 0},
-    {"r10", "r10b", 0, 0},
-    {"r9", "r9b", 0, 0},
-    {"r8", "r8b", 0, 0},
-    {"rcx", "cl", 0, 0},
-    {"rdx", "dl", 0, 0},
-    {"rsi", "sil", 0, 0},
-    {NULL, 0, 0}
+    {"rax", "al", NULL, 1},
+    {"rdi", "dil", NULL, 1},
+    {"r11", "r11b", NULL, 0},
+    {"r10", "r10b", NULL, 0},
+    {"r9", "r9b", NULL, 0},
+    {"r8", "r8b", NULL, 0},
+    {"rcx", "cl", NULL, 0},
+    {"rdx", "dl", NULL, 0},
+    {"rsi", "sil", NULL, 0},
+    {NULL, NULL, NULL, 0}
 };
 
 NODEPTR_TYPE newNode(eOp op, NODEPTR_TYPE left, NODEPTR_TYPE right) {
@@ -76,8 +76,10 @@ static sRegister* _getNextReg(sRegister *list, const char *name) {
     }
     
     for(i=0; startPos[i].name != NULL; i++) {
-        if(startPos[i].isIdent)
-            continue;
+	if(startPos[i].isUsed) {
+	//  printf("%s is used\n", startPos[i].name);
+	    continue;
+	}
         
         return &(startPos[i]);
     }
@@ -89,14 +91,37 @@ static sRegister* _getNextReg(sRegister *list, const char *name) {
     return NULL;
 }
 
-const char* getNextParamReg(sRegister *list, const char *start) {
-    sRegister *reg = _getNextReg(list, start);
-    reg->isIdent=1;
+
+const char* getNextReg(sRegister *list, const char *regName) {
+    sRegister *reg = _getNextReg(list, regName);
+    reg->isUsed=1;
     return reg->name;
 }
 
-const char* getNextReg(sRegister *list, const char *regName) {
-    return _getNextReg(list, regName)->name;
+const char* getParamReg() {
+  return "rdi";
+}
+
+const char* getResultReg() {
+  return "rax";
+}
+
+void assignIdentToReg(sRegister *list, const char *regName, symbol_t *ident) {
+    int i;
+    //sRegister *reg;
+    
+    for(i=0; list[i].name != NULL; i++) {
+      if(strcmp(regName, list[i].name) != 0)
+	continue;
+      
+      list[i].ident=ident;
+      list[i].isUsed=1;
+      ident->regname=list[i].name;
+  //    printf("assigned %s to %s\n", ident->name, list[i].name);
+      return;
+    }
+    
+  //  printf("failed to assign %s to %s\n", ident, regName);
 }
 
 static const char *getByteReg(const char *reg) {
@@ -180,10 +205,19 @@ void genTagList(const char *dstReg, const char *srcReg) {
     printf("add $1, %%%s\n", dstReg);
 }
 
+
+void genTagFunc(const char *dstReg, const char *srcReg) {
+    move(dstReg, srcReg);
+    printf("add $3, %%%s\n", dstReg);
+}
+
 void genSymbol(const char *fName) {
     printf("\n.text\n");
     printf(".globl %s\n", fName);
-    printf("\t.type %s, @function\n", fName);
+    printf(".type %s, @function\n", fName);
+}
+
+void genLabel(const char *fName) {
     printf("%s:\n",fName);
     printf("pushq %%r12\n");
 }
@@ -314,9 +348,63 @@ int nextIfLabelNum(void) {
     return labelNum++;
 }
 
-void genCallSymbol(const char *symName, const char *srcReg) {
+void genCallSymbol(const char *dstReg, const char *symName, const char *srcReg) {
     move("rdi", srcReg);
-    printf("pop %%r12\n");
-    printf("jmp %s\n", symName);
+    printf("call %s\n", symName);
+    move(dstReg, "rax");
 }
- 
+
+void genClosure(const char *dstReg, const char *label, symbol_t *symbols) {
+    symbol_t *e;
+    int symCnt=0;
+    
+    move(dstReg, "r15");
+    
+    
+    printf("add $16, %%r15\n");
+    
+    printf("movq $%s, 0(%%%s)\n", label, dstReg);
+    printf("mov %%r15, 8(%%%s)\n", dstReg);
+    
+    for(e=symbols; e != NULL; e=e->next) {
+      if(e->offset == -1)
+	continue;
+      
+      printf("mov %%%s, %d(%%r15)\n", e->regname, e->offset);
+      symCnt++;
+    }
+    
+    printf("add $%d, %%r15\n", symCnt*8);
+}
+
+const char* labelNameFromNum(const char *prefix, int num) {
+    char *buf = calloc(100,1);
+    
+    sprintf(buf, "%s%d", prefix, num);
+    
+    return buf;
+}
+
+
+void restoreEnvironment(sRegister *regList, symbol_t *list) {
+  symbol_t *e;
+  
+ // printf("restore environment\n");
+  
+  for(e=list; e != NULL; e=e->next) {
+    if(e->offset == -1)
+      continue;
+    
+    assignIdentToReg(regList, getNextReg(regList, NULL), e);
+    
+    printf("mov %d(%%r12), %%%s\n", e->offset, e->regname);
+  }
+}
+
+
+void genClosureCall(const char *dstReg, const char *clsrReg, const char *srcReg) {
+    move("rdi", srcReg);
+    printf("mov 8(%%%s), %%r12\n", clsrReg);
+    printf("call *%%%s\n", clsrReg);
+    move(dstReg, "rax");
+}

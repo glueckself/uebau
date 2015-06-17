@@ -15,12 +15,38 @@ static symbol_t* mkElement(char *name) {
     return item;
 }
 
-symbol_t* addSymbol(symbol_t *list, char *name) {
+static int getNextFreeOffset(symbol_t *list) {
+  symbol_t *e;
+  int offset=-8;
+  
+  if(list == NULL)
+    return -1;
+  
+  for(e=list; e != NULL; e=e->next) {
+      if(e->offset == -1)
+	continue;
+      
+      if(e->offset > offset)
+	offset=e->offset;
+  }
+  
+  return offset+8;
+}
+
+static symbol_t* _addSymbol(symbol_t *list, char *name) {
     symbol_t *item;
     
     item=mkElement(name);
     
     item->next=list;
+    
+    return item;
+}
+
+symbol_t* addSymbol(symbol_t *list, char *name) {
+    symbol_t *item=_addSymbol(list, name);
+
+    item->offset=getNextFreeOffset(list);
     
     return item;
 }
@@ -31,6 +57,7 @@ symbol_t* addGlobalSymbol(symbol_t *list, char *name) {
     for(item=list; item->next != NULL; item=item->next); //beim letzten element stehen bleiben
     
     item->next=mkElement(name);
+    item->next->offset=-1;
     
     return list;
 }
@@ -85,16 +112,9 @@ symbol_t* mergeLists(symbol_t *list1, symbol_t *list2) {
     symbol_t *item;
     
     for(item=list2; item != NULL; item = item->next) {
-        list1=addSymbol(list1, item->name);
+        list1=_addSymbol(list1, item->name);
+	list1->offset=item->offset;
     }
     
     return list1;
-}
-
-void addSymbolStorage(symbol_t *list, char *name, const char *reg) {
-    symbol_t *sym = lookupSymbol(list, name);
-    
-    assert(sym != NULL);
-    
-    sym->regname=reg;
 }
