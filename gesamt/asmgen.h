@@ -116,5 +116,5 @@ void restoreEnvironment(sRegister *regList, symbol_t *list);
 void genClosureCall(const char *dstReg, const char *clsrReg, symbol_t *sym, const char *srcReg);
 void genClosureFromReg(const char *dstReg, const char *srcReg);
 
-void genCallSymbol(const char *dstReg, symbol_t *sym, const char *srcReg);
+void genCallSymbol(const char *dstReg, const char *symName, symbol_t *sym, const char *srcReg);
 #endif

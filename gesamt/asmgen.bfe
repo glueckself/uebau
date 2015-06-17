@@ -21,7 +21,7 @@ expr: OP_TAIL(listexpr)               # 1 # genTail(bnode->regname, kids[0]->reg
 expr: OP_IDENT                        # 1 # assignFromIdent(bnode->regname, bnode->ident->regname);
 expr: OP_IF(expr)                     # 1 # genIf(bnode->regname, bnode->labelNum); burm_label(bnode->kids[1]); burm_reduce(bnode->kids[1],1);
 expr: OP_LET(expr)                    # 1 # burm_label(bnode->kids[1]); burm_reduce(bnode->kids[1], 1);
-expr: OP_CALL(ident, expr)            # 1 # genCallSymbol(bnode->regname, kids[0]->ident, kids[1]->regname);
+expr: OP_CALL(ident, expr)            # 1 # genCallSymbol(bnode->regname, kids[0]->ident->name, kids[1]->ident, kids[1]->regname);
 expr: OP_CALL(fexpr, expr)            # 1 # genClosureCall(bnode->regname, kids[0]->regname, kids[1]->ident, kids[1]->regname);
 
 fexpr: OP_CLOSURE                     # 1 # genClosure(bnode->regname, bnode->kids[0]->name, bnode->ident);

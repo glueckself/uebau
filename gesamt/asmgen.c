@@ -137,6 +137,30 @@ static const char *getByteReg(const char *reg) {
     return NULL;
 }
 
+static void saveIdentifiers(symbol_t *sym) {
+    int varCnt=0;
+    symbol_t *e;
+    for(e=sym; e != NULL; e=e->next) {
+        if(e->offset == -1)
+            continue;
+        printf("mov %%%s, %d(%%rsp)\n", e->regname, e->offset);
+        varCnt++;
+    }
+    printf("sub $%d, %%rsp\n", varCnt*8);
+}
+
+static void restoreIdentifiers(symbol_t *sym) {
+    int varCnt=0;
+    symbol_t *e;
+    for(e=sym; e != NULL; e=e->next) {
+        if(e->offset == -1)
+            continue;
+        printf("mov %d(%%rsp), %%%s\n", e->offset, e->regname);
+        varCnt++;
+    }
+    printf("add $%d, %%rsp\n", varCnt*8);
+}
+
 static void move(const char *dstReg, const char *srcReg) {
     if(strcmp(dstReg,srcReg) == 0)
         return;
@@ -348,22 +372,12 @@ int nextIfLabelNum(void) {
     return labelNum++;
 }
 
-void genCallSymbol(const char *dstReg, symbol_t *sym, const char *srcReg) {
-    int varCnt=0;
-    symbol_t *e;
-    for(e=sym; e != NULL; e=e->next)  {
-        printf("mov %%%s, %d(%%rsp)", e->regname, e->offset);
-        varCnt++;
-    }
-    printf("sub $d, %%rsp\n", varCnt*8);
-
+void genCallSymbol(const char *dstReg, const char *symName, symbol_t *sym, const char *srcReg) {
+    saveIdentifiers(sym);
     move("rdi", srcReg);
     printf("call %s\n", symName);
     move(dstReg, "rax");
-
-    for(e=sym; e != NULL; e=e->next)
-        printf("mov %d(%%rsp), %%%s", e->offset, e->regname);
-    printf("add $d, %%rsp\n", varCnt*8);
+    restoreIdentifiers(sym);
 }
 
 void genClosure(const char *dstReg, const char *label, symbol_t *symbols) {
@@ -415,21 +429,12 @@ void restoreEnvironment(sRegister *regList, symbol_t *list) {
 
 
 void genClosureCall(const char *dstReg, const char *clsrReg, symbol_t *sym, const char *srcReg) {
-    int varCnt=0;
-    for(e=sym; e != NULL; e=e->next) {
-        printf("mov %%%s, %d(%%rsp)", e->regname, e->offset);
-        varCnt++;
-    }
-    printf("sub $d, %%rsp\n", varCnt*8);
-
+    saveIdentifiers(sym);
     move("rdi", srcReg);
     printf("mov 8(%%%s), %%r12\n", clsrReg);
     printf("call *%%%s\n", clsrReg);
     move(dstReg, "rax");
-
-    for(e=sym; e != NULL; e=e->next) 
-        printf("mov %%%s, %d(%%rsp)", e->regname, e->offset);
-    printf("add $d, %%rsp\n", varCnt*8);
+    restoreIdentifiers(sym);
 }
 
 
