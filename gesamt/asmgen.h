@@ -114,6 +114,7 @@ void genClosure(const char *dstReg, const char *label, symbol_t *symbols);
 void genTagFunc(const char *dstReg, const char *srcReg);
 void restoreEnvironment(sRegister *regList, symbol_t *list);
 void genClosureCall(const char *dstReg, const char *clsrReg, const char *srcReg);
+void genClosureFromReg(const char *dstReg, const char *srcReg);
 
 void genCallSymbol(const char *dstReg, const char *symName, const char *srcReg);
 #endif

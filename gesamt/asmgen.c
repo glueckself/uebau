@@ -408,3 +408,9 @@ void genClosureCall(const char *dstReg, const char *clsrReg, const char *srcReg)
     printf("call *%%%s\n", clsrReg);
     move(dstReg, "rax");
 }
+
+
+void genClosureFromReg(const char *dstReg, const char *srcReg) {
+  move(dstReg, srcReg);
+  printf("sub $3, %%%s\n", dstReg);
+}
