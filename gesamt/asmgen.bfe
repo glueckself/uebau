@@ -9,7 +9,7 @@
 
 %%
 
-eval: OP_EVAL(expr)                   # 0 # genReturn(bnode->regname, kids[0]->regname); SINGLE_ASSIGN(bnode->regList, bnode->regname, kids[0]->regname);
+eval: OP_EVAL(expr)                   # 0 # genReturn(bnode->regname, kids[0]->regname);
 eval: expr                            # 0 # assignFromIdent(bnode->regname, kids[0]->regname); SINGLE_ASSIGN(bnode->regList, bnode->regname, kids[0]->regname);
 eval: condeval                        # 0 # 
 

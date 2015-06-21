@@ -53,7 +53,8 @@ typedef struct {
     char *byteName;
     symbol_t *ident;
     eRegState state;
-    eSymType type;
+
+ //   eSymType type;
 } sRegister;
 
 typedef struct _NodeType *NODEPTR_TYPE;
@@ -80,8 +81,8 @@ const char* getResultReg();
 const char* getParamReg();
 void markReg(sRegister *list, const char *regName, eRegState state);
 
-#define SINGLE_ASSIGN(list, dst, src) markReg((list), (dst), REG_USED); markReg((list),(src),REG_FREE);
-#define DOUBLE_ASSIGN(list, dst, src1, src2) markReg((list), (dst), REG_USED); markReg((list),(src1),REG_FREE); markReg((list),(src2),REG_FREE);
+#define SINGLE_ASSIGN(list, dst, src) do {markReg((list), (dst), REG_USED); markReg((list),(src),REG_FREE);}while(0)
+#define DOUBLE_ASSIGN(list, dst, src1, src2) do{ markReg((list), (dst), REG_USED); markReg((list),(src1),REG_FREE); markReg((list),(src2),REG_FREE);}while(0)
 
 void assignIdentToReg(sRegister *list, const char *reg, symbol_t *ident);
 

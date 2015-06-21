@@ -12,9 +12,10 @@
 static const symbol_t raxReg = {0};
 
 static const sRegister regListTemplate[] = {
-    {"rax", "al", (symbol_t*)&raxReg, REG_USED},
     {"rdi", "dil", (symbol_t*)&raxReg, REG_USED},
+    {"rax", "al", NULL, REG_FREE},
     {"r11", "r11b", NULL, REG_FREE},
+    
     {"r10", "r10b", NULL, REG_FREE},
     {"r9", "r9b", NULL, REG_FREE},
     {"r8", "r8b", NULL, REG_FREE},
@@ -107,7 +108,18 @@ const char* getResultReg() {
 }
 
 void markReg(sRegister *list, const char *regName, eRegState state) {
-    sRegister *reg = _getNextReg(list, regName);
+    int i;
+    sRegister *reg = NULL;
+    
+    for(i=0;i<NUM_REGISTERS;i++) {
+      if(strcmp(list[i].name, regName) == 0) {
+	reg=&(list[i]);
+	break;
+      }
+    }
+    
+    if(reg == NULL)
+      return;
     
     if(reg->ident != NULL)
       state=REG_USED;
@@ -126,7 +138,6 @@ void assignIdentToReg(sRegister *list, const char *regName, symbol_t *ident) {
       list[i].ident=ident;
       list[i].state=REG_USED;
       ident->regname=list[i].name;
-  //    printf("assigned %s to %s\n", ident->name, list[i].name);
       return;
     }
     
@@ -254,8 +265,7 @@ void genLabel(const char *fName) {
 }
 
 void genReturn(const char *dstReg, const char *srcReg) {
-    if(dstReg != NULL && srcReg != NULL)
-        move(dstReg, srcReg);
+    move("rax", srcReg);
     printf("popq %%r12\n");
     printf("ret\n\n");
 }
