@@ -9,20 +9,23 @@
 
 #define ENABLE_OPT_TYPECHECK 0
 
-const symbol_t raxReg = {0};
+static const symbol_t raxReg = {0};
 
-const sRegister regListTemplate[] = {
-    {"rax", "al", (symbol_t*)&raxReg, 1},
-    {"rdi", "dil", (symbol_t*)&raxReg, 1},
-    {"r11", "r11b", NULL, 0},
-    {"r10", "r10b", NULL, 0},
-    {"r9", "r9b", NULL, 0},
-    {"r8", "r8b", NULL, 0},
-    {"rcx", "cl", NULL, 0},
-    {"rdx", "dl", NULL, 0},
-    {"rsi", "sil", NULL, 0},
-    {NULL, NULL, NULL, 0}
+static const sRegister regListTemplate[] = {
+    {"rax", "al", (symbol_t*)&raxReg, REG_USED},
+    {"rdi", "dil", (symbol_t*)&raxReg, REG_USED},
+    {"r11", "r11b", NULL, REG_FREE},
+    {"r10", "r10b", NULL, REG_FREE},
+    {"r9", "r9b", NULL, REG_FREE},
+    {"r8", "r8b", NULL, REG_FREE},
+    {"rcx", "cl", NULL, REG_FREE},
+    {"rdx", "dl", NULL, REG_FREE},
+    {"rsi", "sil", NULL, REG_FREE},
 };
+
+static const int NUM_REGISTERS = (sizeof(regListTemplate)/sizeof(sRegister));
+
+
 
 NODEPTR_TYPE newNode(eOp op, NODEPTR_TYPE left, NODEPTR_TYPE right) {
     NODEPTR_TYPE node = calloc(1, sizeof(NODE_TYPE));
@@ -78,23 +81,22 @@ static sRegister* _getNextReg(sRegister *list, const char *name) {
     }
     
     for(i=0; startPos[i].name != NULL; i++) {
-	if(startPos[i].ident != NULL) {
-	//  printf("%s is used\n", startPos[i].name);
+	if(startPos[i].ident != NULL)
 	    continue;
-	}
+
+	if(startPos[i].state == REG_USED)
+	  continue;
         
         return &(startPos[i]);
     }
     
-
-    //we should compile all statically correct programs but it doesn't mean to execute them :)
+    //we should compile all statically correct programs but it doesn't mean to execute them correctly :)
     return &startPos[0];
 }
 
 
 const char* getNextReg(sRegister *list, const char *regName) {
     sRegister *reg = _getNextReg(list, regName);
-    reg->isUsed=1;
     return reg->name;
 }
 
@@ -106,6 +108,15 @@ const char* getResultReg() {
   return "rax";
 }
 
+void markReg(sRegister *list, const char *regName, eRegState state) {
+    sRegister *reg = _getNextReg(list, regName);
+    
+    if(reg->ident != NULL)
+      state=REG_USED;
+    
+    reg->state=state;
+}
+  
 void assignIdentToReg(sRegister *list, const char *regName, symbol_t *ident) {
     int i;
     //sRegister *reg;
@@ -115,7 +126,7 @@ void assignIdentToReg(sRegister *list, const char *regName, symbol_t *ident) {
 	continue;
       
       list[i].ident=ident;
-      list[i].isUsed=1;
+      list[i].state=REG_USED;
       ident->regname=list[i].name;
   //    printf("assigned %s to %s\n", ident->name, list[i].name);
       return;
@@ -137,28 +148,26 @@ static const char *getByteReg(const char *reg) {
     return NULL;
 }
 
-static void saveIdentifiers(symbol_t *sym) {
-    int varCnt=0;
-    symbol_t *e;
-    for(e=sym; e != NULL; e=e->next) {
-        if(e->offset == -1)
-            continue;
-        printf("movq %%%s, %d(%%rsp)\n", e->regname, 0-8-e->offset);
-        varCnt++;
+static void saveIdentifiers(sRegister *list) {
+    int i;
+    
+    for(i=0; i<NUM_REGISTERS; i++) {
+	if(list[i].state == REG_FREE)
+	  continue;
+	
+	printf("pushq %%%s\n", list[i].name);
     }
-    printf("sub $%d, %%rsp\n", varCnt*8);
 }
 
-static void restoreIdentifiers(symbol_t *sym) {
-    int varCnt=0;
-    symbol_t *e;
-    for(e=sym; e != NULL; e=e->next) {
-        if(e->offset == -1)
-            continue;
-        printf("movq %d(%%rsp), %%%s\n", e->offset, e->regname);
-        varCnt++;
+static void restoreIdentifiers(sRegister *list) {
+    int i;
+    
+    for(i=NUM_REGISTERS-1; i >= 0; i--) {
+      if(list[i].state == REG_FREE)
+	continue;
+      
+      printf("popq %%%s\n", list[i].name);
     }
-    printf("add $%d, %%rsp\n", varCnt*8);
 }
 
 static void move(const char *dstReg, const char *srcReg) {
@@ -372,12 +381,12 @@ int nextIfLabelNum(void) {
     return labelNum++;
 }
 
-void genCallSymbol(const char *dstReg, const char *symName, symbol_t *sym, const char *srcReg) {
-    saveIdentifiers(sym);
+void genCallSymbol(sRegister *regList, const char *dstReg, const char *symName, const char *srcReg) {
+    saveIdentifiers(regList);
     move("rdi", srcReg);
     printf("call %s\n", symName);
     move(dstReg, "rax");
-    restoreIdentifiers(sym);
+    restoreIdentifiers(regList);
 }
 
 void genClosure(const char *dstReg, const char *label, symbol_t *symbols) {
@@ -430,13 +439,13 @@ void restoreEnvironment(sRegister *regList, symbol_t *list) {
 }
 
 
-void genClosureCall(const char *dstReg, const char *clsrReg, symbol_t *sym, const char *srcReg) {
-    saveIdentifiers(sym);
+void genClosureCall(sRegister *regList, const char *dstReg, const char *clsrReg, const char *srcReg) {
+    saveIdentifiers(regList);
     move("rdi", srcReg);
     printf("mov 8(%%%s), %%r12\n", clsrReg);
     printf("call *(%%%s)\n", clsrReg);
     move(dstReg, "rax");
-    restoreIdentifiers(sym);
+    restoreIdentifiers(regList);
 }
 
 

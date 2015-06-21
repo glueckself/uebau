@@ -9,57 +9,58 @@
 
 %%
 
-eval: OP_EVAL(expr)                   # 0 # genReturn(bnode->regname, kids[0]->regname);
-eval: expr                            # 0 # assignFromIdent(bnode->regname, kids[0]->regname);
+eval: OP_EVAL(expr)                   # 0 # genReturn(bnode->regname, kids[0]->regname); SINGLE_ASSIGN(bnode->regList, bnode->regname, kids[0]->regname);
+eval: expr                            # 0 # assignFromIdent(bnode->regname, kids[0]->regname); SINGLE_ASSIGN(bnode->regList, bnode->regname, kids[0]->regname);
 eval: condeval                        # 0 # 
 
-expr: numexpr                         # 1 # genTagNum(bnode->regname, kids[0]->regname);
-expr: listexpr                        # 1 # genTagList(bnode->regname, kids[0]->regname);
-expr: fexpr                           # 1 # genTagFunc(bnode->regname, kids[0]->regname);
-expr: OP_HEAD(listexpr)               # 1 # genHead(bnode->regname, kids[0]->regname);
-expr: OP_TAIL(listexpr)               # 1 # genTail(bnode->regname, kids[0]->regname);
-expr: OP_IDENT                        # 1 # assignFromIdent(bnode->regname, bnode->ident->regname);
-expr: OP_IF(expr)                     # 1 # genIf(bnode->regname, bnode->labelNum); burm_label(bnode->kids[1]); burm_reduce(bnode->kids[1],1);
+expr: numexpr                         # 1 # genTagNum(bnode->regname, kids[0]->regname); SINGLE_ASSIGN(bnode->regList, bnode->regname, kids[0]->regname);
+expr: listexpr                        # 1 # genTagList(bnode->regname, kids[0]->regname); SINGLE_ASSIGN(bnode->regList, bnode->regname, kids[0]->regname);
+expr: fexpr                           # 1 # genTagFunc(bnode->regname, kids[0]->regname); SINGLE_ASSIGN(bnode->regList, bnode->regname, kids[0]->regname);
+expr: OP_HEAD(listexpr)               # 1 # genHead(bnode->regname, kids[0]->regname); SINGLE_ASSIGN(bnode->regList, bnode->regname, kids[0]->regname);
+expr: OP_TAIL(listexpr)               # 1 # genTail(bnode->regname, kids[0]->regname); SINGLE_ASSIGN(bnode->regList, bnode->regname, kids[0]->regname);
+expr: OP_IDENT                        # 1 # assignFromIdent(bnode->regname, bnode->ident->regname); markReg(bnode->regList, bnode->regname, REG_USED);
+
+expr: OP_IF(expr)                     # 1 # genIf(bnode->regname, bnode->labelNum); burm_label(bnode->kids[1]); burm_reduce(bnode->kids[1],1); markReg(bnode->regList, bnode->regname, REG_FREE);
 expr: OP_LET(expr)                    # 1 # burm_label(bnode->kids[1]); burm_reduce(bnode->kids[1], 1);
-expr: OP_CALL(ident, expr)            # 1 # if(kids[0]->ident->offset < 0) genCallSymbol(bnode->regname, kids[0]->ident->name, kids[1]->ident, kids[1]->regname); else genClosureCall(bnode->regname, kids[0]->ident->regname, kids[1]->ident, kids[1]->regname);
-expr: OP_CALL(fexpr, expr)            # 1 # genClosureCall(bnode->regname, kids[0]->regname, kids[1]->ident, kids[1]->regname);
+expr: OP_CALL(ident, expr)            # 1 # if(kids[0]->ident->offset < 0) genCallSymbol(bnode->regList, bnode->regname, kids[0]->ident->name, kids[1]->regname); else genClosureCall(bnode->regList, bnode->regname, kids[0]->ident->regname, kids[1]->regname);
+expr: OP_CALL(fexpr, expr)            # 1 # genClosureCall(bnode->regList, bnode->regname, kids[0]->regname, kids[1]->regname);
 
 fexpr: OP_CLOSURE                     # 1 # genClosure(bnode->regname, bnode->kids[0]->name, bnode->ident);
-fexpr: expr                           # 1 # genClosureFromReg(bnode->regname, kids[0]->regname);
+fexpr: expr                           # 1 # genClosureFromReg(bnode->regname, kids[0]->regname); SINGLE_ASSIGN(bnode->regList, bnode->regname, kids[0]->regname);
 
 condeval: OP_CONDEVAL(thenexpr, elseexpr) # 0 #  
 thenexpr: expr                        # 0 # genElseLabel(bnode->regname, bnode->parent->labelNum);
 elseexpr: expr                        # 0 # genEndIfLabel(bnode->regname, bnode->parent->labelNum);
 
-listexpr: OP_DOT(expr, expr)          # 1 # genDot(bnode->regname, kids[0]->regname, kids[1]->regname);
-listexpr: OP_IDENT                    # 1 # genListFromIdent(bnode->regname, bnode->ident);
-listexpr: expr                        # 1 # genListFromReg(bnode->regname, kids[0]->regname);
+listexpr: OP_DOT(expr, expr)          # 1 # genDot(bnode->regname, kids[0]->regname, kids[1]->regname); DOUBLE_ASSIGN(bnode->regList, bnode->regname, kids[0]->regname, kids[1]->regname);
+listexpr: OP_IDENT                    # 1 # genListFromIdent(bnode->regname, bnode->ident); markReg(bnode->regList, bnode->regname, REG_USED);
+listexpr: expr                        # 1 # genListFromReg(bnode->regname, kids[0]->regname); SINGLE_ASSIGN(bnode->regList, bnode->regname, kids[0]->regname);
 
-numexpr: OP_ISNUM(expr)               # 1 # genIsNum(bnode->regname, kids[0]->regname);
-numexpr: OP_ISLIST(expr)              # 1 # genIsList(bnode->regname, kids[0]->regname);
-numexpr: OP_ISFUN(expr)               # 1 # genIsFun(bnode->regname, kids[0]->regname);
-numexpr: OP_ISFUN(imm)                # 1 # assignFromNum(bnode->regname, 0);
-numexpr: OP_ISNUM(imm)                # 1 # assignFromNum(bnode->regname, 1);
-numexpr: OP_ISLIST(imm)               # 1 # assignFromNum(bnode->regname, 0);
-numexpr: OP_PLUS(numexpr, numexpr)    # 2 # genAdd(bnode->regname, kids[0]->regname, (kids[1]->regname));
-numexpr: OP_PLUS(numexpr, imm)        # 1 # genAddI(bnode->regname, kids[0]->regname, kids[1]->val);
-numexpr: OP_PLUS(imm, numexpr)        # 1 # genAddI(bnode->regname, kids[1]->regname, kids[0]->val);
-numexpr: OP_MINUS(numexpr, numexpr)   # 2 # genMinus(bnode->regname,kids[0]->regname, kids[1]->regname);
-numexpr: OP_MINUS(numexpr, imm)       # 1 # genMinusI(bnode->regname,kids[0]->regname, kids[1]->val);
-numexpr: OP_MULT(numexpr, numexpr)    # 2 # genMult(bnode->regname,kids[0]->regname, kids[1]->regname);
-numexpr: OP_MULT(numexpr, imm)        # 1 # genMultI(bnode->regname,kids[0]->regname, kids[1]->val);
-numexpr: OP_MULT(imm, numexpr)        # 1 # genMultI(bnode->regname,kids[1]->regname, kids[0]->val);
-numexpr: OP_AND(numexpr, numexpr)     # 2 # genAnd(bnode->regname,kids[0]->regname, kids[1]->regname);
-numexpr: OP_AND(numexpr, imm)         # 1 # genAndI(bnode->regname,kids[0]->regname, kids[1]->val);
-numexpr: OP_AND(imm, numexpr)         # 1 # genAndI(bnode->regname,kids[1]->regname, kids[0]->val);
-numexpr: OP_NOT(numexpr)              # 2 # genNot(bnode->regname, kids[0]->regname);
-numexpr: OP_NOT(imm)                  # 1 # assignFromNum(bnode->regname, kids[0]->val);
-numexpr: OP_LESS(numexpr, numexpr)    # 1 # genLess(bnode->regname,kids[0]->regname, kids[1]->regname);
-numexpr: OP_EQUAL(expr, expr)         # 1 # genEqual(bnode->regname,kids[0]->regname, kids[1]->regname);
-numexpr: OP_NUM                       # 1 # assignFromNum(bnode->regname, bnode->val);
-numexpr: OP_IDENT                     # 1 # genNumFromIdent(bnode->regname, bnode->ident);
-numexpr: expr                         # 1 # genNumFromReg(bnode->regname, kids[0]->regname);
-numexpr: imm                          # 1 # assignFromNum(bnode->regname, kids[0]->val);
+numexpr: OP_ISNUM(expr)               # 1 # genIsNum(bnode->regname, kids[0]->regname); SINGLE_ASSIGN(bnode->regList, bnode->regname, kids[0]->regname);
+numexpr: OP_ISLIST(expr)              # 1 # genIsList(bnode->regname, kids[0]->regname); SINGLE_ASSIGN(bnode->regList, bnode->regname, kids[0]->regname);
+numexpr: OP_ISFUN(expr)               # 1 # genIsFun(bnode->regname, kids[0]->regname); SINGLE_ASSIGN(bnode->regList, bnode->regname, kids[0]->regname);
+numexpr: OP_ISFUN(imm)                # 1 # assignFromNum(bnode->regname, 0); markReg(bnode->regList, bnode->regname, REG_USED);
+numexpr: OP_ISNUM(imm)                # 1 # assignFromNum(bnode->regname, 1); markReg(bnode->regList, bnode->regname, REG_USED);
+numexpr: OP_ISLIST(imm)               # 1 # assignFromNum(bnode->regname, 0); markReg(bnode->regList, bnode->regname, REG_USED);
+numexpr: OP_PLUS(numexpr, numexpr)    # 2 # genAdd(bnode->regname, kids[0]->regname, (kids[1]->regname)); DOUBLE_ASSIGN(bnode->regList, bnode->regname, kids[0]->regname, kids[1]->regname);
+numexpr: OP_PLUS(numexpr, imm)        # 1 # genAddI(bnode->regname, kids[0]->regname, kids[1]->val); SINGLE_ASSIGN(bnode->regList, bnode->regname, kids[0]->regname);
+numexpr: OP_PLUS(imm, numexpr)        # 1 # genAddI(bnode->regname, kids[1]->regname, kids[0]->val); SINGLE_ASSIGN(bnode->regList, bnode->regname, kids[1]->regname);
+numexpr: OP_MINUS(numexpr, numexpr)   # 2 # genMinus(bnode->regname,kids[0]->regname, kids[1]->regname); DOUBLE_ASSIGN(bnode->regList, bnode->regname, kids[0]->regname, kids[1]->regname);
+numexpr: OP_MINUS(numexpr, imm)       # 1 # genMinusI(bnode->regname,kids[0]->regname, kids[1]->val); SINGLE_ASSIGN(bnode->regList, bnode->regname, kids[0]->regname);
+numexpr: OP_MULT(numexpr, numexpr)    # 2 # genMult(bnode->regname,kids[0]->regname, kids[1]->regname); DOUBLE_ASSIGN(bnode->regList, bnode->regname, kids[0]->regname, kids[1]->regname);
+numexpr: OP_MULT(numexpr, imm)        # 1 # genMultI(bnode->regname,kids[0]->regname, kids[1]->val); SINGLE_ASSIGN(bnode->regList, bnode->regname, kids[0]->regname);
+numexpr: OP_MULT(imm, numexpr)        # 1 # genMultI(bnode->regname,kids[1]->regname, kids[0]->val); SINGLE_ASSIGN(bnode->regList, bnode->regname, kids[1]->regname);
+numexpr: OP_AND(numexpr, numexpr)     # 2 # genAnd(bnode->regname,kids[0]->regname, kids[1]->regname); DOUBLE_ASSIGN(bnode->regList, bnode->regname, kids[0]->regname, kids[1]->regname);
+numexpr: OP_AND(numexpr, imm)         # 1 # genAndI(bnode->regname,kids[0]->regname, kids[1]->val); SINGLE_ASSIGN(bnode->regList, bnode->regname, kids[0]->regname);
+numexpr: OP_AND(imm, numexpr)         # 1 # genAndI(bnode->regname,kids[1]->regname, kids[0]->val); SINGLE_ASSIGN(bnode->regList, bnode->regname, kids[1]->regname);
+numexpr: OP_NOT(numexpr)              # 2 # genNot(bnode->regname, kids[0]->regname); SINGLE_ASSIGN(bnode->regList, bnode->regname, kids[0]->regname);
+numexpr: OP_NOT(imm)                  # 1 # assignFromNum(bnode->regname, kids[0]->val); markReg(bnode->regList, bnode->regname, REG_USED);
+numexpr: OP_LESS(numexpr, numexpr)    # 1 # genLess(bnode->regname,kids[0]->regname, kids[1]->regname); DOUBLE_ASSIGN(bnode->regList, bnode->regname, kids[0]->regname, kids[1]->regname);
+numexpr: OP_EQUAL(expr, expr)         # 1 # genEqual(bnode->regname,kids[0]->regname, kids[1]->regname); DOUBLE_ASSIGN(bnode->regList, bnode->regname, kids[0]->regname, kids[1]->regname);
+numexpr: OP_NUM                       # 1 # assignFromNum(bnode->regname, bnode->val); markReg(bnode->regList, bnode->regname, REG_USED);
+numexpr: OP_IDENT                     # 1 # genNumFromIdent(bnode->regname, bnode->ident); markReg(bnode->regList, bnode->regname, REG_USED);
+numexpr: expr                         # 1 # genNumFromReg(bnode->regname, kids[0]->regname); SINGLE_ASSIGN(bnode->regList, bnode->regname, kids[0]->regname);
+numexpr: imm                          # 1 # assignFromNum(bnode->regname, kids[0]->val); markReg(bnode->regList, bnode->regname, REG_USED);
 
 imm: OP_PLUS(imm, imm)       # 0 # bnode->val = kids[0]->val + kids[1]->val;
 imm: OP_MINUS(imm, imm)      # 0 # bnode->val = kids[0]->val - kids[1]->val;

@@ -79,6 +79,7 @@ Def: IDENT EQUAL Lambda @{
         
         @reg @Lambda.node@->name = @IDENT.val@;
         @reg @Lambda.node@->labelNum = -1;
+        @reg @Lambda.node@->regList=@Lambda.regList@;
         
         @codegen @revorder(1) genSymbol(@IDENT.val@);
      @}
@@ -123,6 +124,7 @@ Expr: IF Expr THEN Expr ELSE Expr END @{
 	@reg @Lambda.node@->labelNum = nextIfLabelNum();
 	@reg @Lambda.node@->name = labelNameFromNum("lambda",@Lambda.node@->labelNum);
 	@reg @Expr.node@->ident = @Expr.sym@;
+        @reg @Lambda.node@->regList=@Lambda.regList@;
     @}
     | LET IDENT EQUAL Expr IN Expr END @{ 
           @i @Expr.2.sym@ = addSymbol(@Expr.0.sym@, @IDENT.val@);

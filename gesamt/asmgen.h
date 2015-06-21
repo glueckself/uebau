@@ -43,6 +43,19 @@ typedef enum {
     OP_CLOSURE=21
 } eOp;
 
+typedef enum {
+  REG_FREE=0,
+  REG_USED,
+} eRegState;
+
+typedef struct {
+    char *name;
+    char *byteName;
+    symbol_t *ident;
+    eRegState state;
+    eSymType type;
+} sRegister;
+
 typedef struct _NodeType *NODEPTR_TYPE;
 typedef struct _NodeType NODE_TYPE;
 struct _NodeType {
@@ -55,15 +68,9 @@ struct _NodeType {
     symbol_t *ident;
     const char *regname;
     const char *name;
+    sRegister *regList;
 };
 
-typedef struct {
-    char *name;
-    char *byteName;
-    symbol_t *ident;
-    int isUsed;
-    eSymType type;
-} sRegister;
 
 NODEPTR_TYPE newNode(eOp op, NODEPTR_TYPE left, NODEPTR_TYPE right);
 NODEPTR_TYPE newNumNode(int value);
@@ -71,6 +78,11 @@ NODEPTR_TYPE newIdentNode(symbol_t *ident);
 const char* getNextReg(sRegister *list, const char *regName);
 const char* getResultReg();
 const char* getParamReg();
+void markReg(sRegister *list, const char *regName, eRegState state);
+
+#define SINGLE_ASSIGN(list, dst, src) markReg((list), (dst), REG_USED); markReg((list),(src),REG_FREE);
+#define DOUBLE_ASSIGN(list, dst, src1, src2) markReg((list), (dst), REG_USED); markReg((list),(src1),REG_FREE); markReg((list),(src2),REG_FREE);
+
 void assignIdentToReg(sRegister *list, const char *reg, symbol_t *ident);
 
 sRegister* newRegList(void);
@@ -113,8 +125,8 @@ void genEndIfLabel(const char *reg, int labelNum);
 void genClosure(const char *dstReg, const char *label, symbol_t *symbols);
 void genTagFunc(const char *dstReg, const char *srcReg);
 void restoreEnvironment(sRegister *regList, symbol_t *list);
-void genClosureCall(const char *dstReg, const char *clsrReg, symbol_t *sym, const char *srcReg);
+void genClosureCall(sRegister *regList, const char *dstReg, const char *clsrReg, const char *srcReg);
 void genClosureFromReg(const char *dstReg, const char *srcReg);
 
-void genCallSymbol(const char *dstReg, const char *symName, symbol_t *sym, const char *srcReg);
+void genCallSymbol(sRegister *regList, const char *dstReg, const char *symName, const char *srcReg);
 #endif
