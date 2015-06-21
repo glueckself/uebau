@@ -16,5 +16,5 @@ parser_iburg.c: asmgen.bfe asmgen.h
 	bfe asmgen.bfe | iburg > parser_iburg.c
 
 clean:
-	rm -f parser_iburg.c lex.yy.c y.tab.c oxout.y oxout.l gesamt y.tab.h
+	rm -f parser_iburg.c lex.yy.c y.tab.c oxout.y oxout.l gesamt y.tab.h testgesamt* a.out
 

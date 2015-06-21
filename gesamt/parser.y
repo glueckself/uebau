@@ -96,6 +96,7 @@ Lambda:	FUN IDENT ARROW Expr END @{
 
 	    @reg @Lambda.node@->regname = getResultReg();
             @reg @Expr.node@->regname = @Lambda.node@->regname;
+            @reg @Expr.node@->regList = @Lambda.regList@;
             
 	    @codegen genLabel(@Lambda.node@->name);
 	    @codegen if(@Lambda.node@->labelNum >= 0) restoreEnvironment(@Lambda.regList@, @Lambda.sym@);
@@ -112,9 +113,11 @@ Expr: IF Expr THEN Expr ELSE Expr END @{
         @reg @Expr.0.node@->labelNum = nextIfLabelNum();
         
         @reg @Expr.1.node@->regname = @Expr.0.node@->regname;
+        @reg @Expr.1.node@->regList = @Expr.0.regList@; 
         @reg @Expr.2.node@->regname = @Expr.0.node@->regname;
+        @reg @Expr.2.node@->regList = @Expr.0.regList@;
         @reg @Expr.3.node@->regname = @Expr.0.node@->regname;
-        
+        @reg @Expr.3.node@->regList = @Expr.0.regList@;
       @} 
     | Lambda @{
 	@i @Expr.node@ = newNode(OP_CLOSURE, @Lambda.node@, NULL);
@@ -134,8 +137,10 @@ Expr: IF Expr THEN Expr ELSE Expr END @{
           @t checkUnknownSymbol(@Expr.0.sym@, @IDENT.val@); 
           
           @reg @Expr.1.node@->regname = getNextReg(@Expr.regList@, @Expr.0.node@->regname);
+          @reg @Expr.1.node@->regList = @Expr.regList@;
           @reg assignIdentToReg(@Expr.regList@, @Expr.1.node@->regname, @Expr.2.sym@);
           @reg @Expr.2.node@->regname = @Expr.0.node@->regname;
+          @reg @Expr.2.node@->regList = @Expr.0.regList@;
       @}
     | EExpr
     | AddTerm
@@ -147,18 +152,24 @@ Expr: IF Expr THEN Expr ELSE Expr END @{
           
           @reg @Term.0.node@->regname = @Expr.node@->regname;
           @reg @Term.1.node@->regname = getNextReg(@Expr.regList@, @Expr.node@->regname);
+          @reg @Term.0.node@->regList = @Expr.0.regList@;
+          @reg @Term.1.node@->regList = @Expr.0.regList@;
       @}
     | Term LESS Term @{
           @i @Expr.node@ = newNode(OP_LESS, @Term.0.node@, @Term.1.node@);
           
           @reg @Term.0.node@->regname = @Expr.node@->regname;
           @reg @Term.1.node@->regname = getNextReg(@Expr.regList@, @Expr.node@->regname);
+          @reg @Term.0.node@->regList = @Expr.0.regList@;
+          @reg @Term.1.node@->regList = @Expr.0.regList@;
       @}
     | Term EQUAL Term @{
           @i @Expr.node@ = newNode(OP_EQUAL, @Term.0.node@, @Term.1.node@);
           
           @reg @Term.0.node@->regname = @Expr.node@->regname;
           @reg @Term.1.node@->regname = getNextReg(@Expr.regList@, @Expr.node@->regname);
+          @reg @Term.0.node@->regList = @Expr.0.regList@;
+          @reg @Term.1.node@->regList = @Expr.0.regList@;
       @}
     | Expr Term @{
 	  @i @Expr.0.node@ = newNode(OP_CALL, @Expr.1.node@,  @Term.node@);
@@ -166,7 +177,10 @@ Expr: IF Expr THEN Expr ELSE Expr END @{
 	  //if expr is 
 	  @reg @Term.node@->regname = getNextReg(@Expr.regList@, @Expr.node@->regname);
 	  @reg @Expr.1.node@->regname = @Expr.node@->regname;
-      @reg @Term.node@->ident = @Term.sym@;
+          @reg @Term.0.node@->regList = @Expr.0.regList@;
+          @reg @Expr.1.node@->regList = @Expr.0.regList@;
+          
+	  @reg @Term.node@->ident = @Term.sym@;
       @}
     ;
 
@@ -178,31 +192,37 @@ KExpr: NOT EExpr @{
           @i @KExpr.node@ = newNode(OP_NOT, @EExpr.node@, NULL);
           
           @reg @EExpr.node@->regname = @KExpr.node@->regname;
+          @reg @EExpr.node@->regList = @KExpr.regList@;
        @}
      | HEAD EExpr @{
           @i @KExpr.node@ = newNode(OP_HEAD, @EExpr.node@, NULL);
           
           @reg @EExpr.node@->regname = @KExpr.node@->regname;
+          @reg @EExpr.node@->regList = @KExpr.regList@;
        @}
      | TAIL EExpr @{
           @i @KExpr.node@ = newNode(OP_TAIL, @EExpr.node@, NULL);
           
           @reg @EExpr.node@->regname = @KExpr.node@->regname;
+          @reg @EExpr.node@->regList = @KExpr.regList@;
        @}
      | ISNUM EExpr @{
           @i @KExpr.node@ = newNode(OP_ISNUM, @EExpr.node@, NULL);
           
           @reg @EExpr.node@->regname = @KExpr.node@->regname;
+          @reg @EExpr.node@->regList = @KExpr.regList@;
        @}
      | ISLIST EExpr @{
           @i @KExpr.node@ = newNode(OP_ISLIST, @EExpr.node@, NULL);
           
           @reg @EExpr.node@->regname = @KExpr.node@->regname;
+          @reg @EExpr.node@->regList = @KExpr.regList@;
        @}
      | ISFUN EExpr @{
           @i @KExpr.node@ = newNode(OP_ISFUN, @EExpr.node@, NULL);
           
           @reg @EExpr.node@->regname = @KExpr.node@->regname;
+          @reg @EExpr.node@->regList = @KExpr.regList@;
        @}
      ;
 
@@ -211,12 +231,17 @@ AddTerm: Term PLUS Term @{
             
           @reg @Term.0.node@->regname = @AddTerm.node@->regname;
           @reg @Term.1.node@->regname = getNextReg(@AddTerm.regList@, @AddTerm.node@->regname);
+          @reg @Term.0.node@->regList = @AddTerm.0.regList@;
+          @reg @Term.1.node@->regList = @AddTerm.0.regList@;
+          
          @}
        | AddTerm PLUS Term @{
             @i @AddTerm.0.node@ = newNode(OP_PLUS, @AddTerm.1.node@, @Term.node@);
             
             @reg @AddTerm.1.node@->regname = @AddTerm.0.node@->regname;
             @reg @Term.0.node@->regname = getNextReg(@AddTerm.regList@, @AddTerm.0.node@->regname);
+          @reg @Term.0.node@->regList = @AddTerm.0.regList@;
+          @reg @AddTerm.1.node@->regList = @AddTerm.0.regList@;
          @}
        ;
 
@@ -225,12 +250,16 @@ MultTerm: Term MULT Term @{
             
           @reg @Term.0.node@->regname = @MultTerm.node@->regname;
           @reg @Term.1.node@->regname = getNextReg(@MultTerm.regList@, @MultTerm.node@->regname);
+          @reg @Term.0.node@->regList = @MultTerm.0.regList@;
+          @reg @Term.1.node@->regList = @MultTerm.0.regList@;
           @}
         | MultTerm MULT Term @{
             @i @MultTerm.0.node@ = newNode(OP_MULT, @MultTerm.1.node@, @Term.node@);
             
             @reg @MultTerm.1.node@->regname = @MultTerm.0.node@->regname;
             @reg @Term.0.node@->regname = getNextReg(@MultTerm.regList@, @MultTerm.0.node@->regname);
+          @reg @Term.0.node@->regList = @MultTerm.0.regList@;
+          @reg @MultTerm.1.node@->regList = @MultTerm.0.regList@;
           @}
         ;
 
@@ -239,12 +268,16 @@ AndTerm: Term AND Term @{
             
           @reg @Term.0.node@->regname = @AndTerm.node@->regname;
           @reg @Term.1.node@->regname = getNextReg(@AndTerm.regList@, @AndTerm.node@->regname);
+          @reg @Term.0.node@->regList = @AndTerm.0.regList@;
+          @reg @Term.1.node@->regList = @AndTerm.0.regList@;
          @}
        | AndTerm AND Term @{
             @i @AndTerm.0.node@ = newNode(OP_AND, @AndTerm.1.node@, @Term.node@);
             
             @reg @AndTerm.1.node@->regname = @AndTerm.0.node@->regname;
             @reg @Term.0.node@->regname = getNextReg(@AndTerm.regList@, @AndTerm.0.node@->regname);
+          @reg @Term.0.node@->regList = @AndTerm.0.regList@;
+          @reg @AndTerm.1.node@->regList = @AndTerm.0.regList@;
           @}
        ;
 
@@ -253,12 +286,16 @@ DotTerm: Term DOT Term @{
             
           @reg @Term.0.node@->regname = @DotTerm.node@->regname;
           @reg @Term.1.node@->regname = getNextReg(@DotTerm.regList@, @DotTerm.node@->regname);
+          @reg @Term.0.node@->regList = @DotTerm.0.regList@;
+          @reg @Term.1.node@->regList = @DotTerm.0.regList@;
          @}
        | Term DOT DotTerm @{
             @i @DotTerm.0.node@ = newNode(OP_DOT, @Term.node@, @DotTerm.1.node@);
             
             @reg @DotTerm.1.node@->regname = getNextReg(@DotTerm.regList@, @DotTerm.0.node@->regname);
             @reg @Term.0.node@->regname = (@DotTerm.0.node@->regname);
+          @reg @Term.0.node@->regList = @DotTerm.0.regList@;
+          @reg @DotTerm.1.node@->regList = @DotTerm.0.regList@;
          @}
        ;
 
@@ -270,6 +307,7 @@ Term: LBRACKET Expr RBRACKET
         @t checkKnownSymbol(@Term.sym@, @IDENT.val@);
         @reg if(@Term.node@->ident == NULL) { @Term.node@->ident = lookupSymbol(@Term.sym@, @IDENT.val@);}
         @i @Term.node@ = newIdentNode(lookupSymbol(@Term.sym@, @IDENT.val@));
+        @reg @Term.node@->regList = @Term.regList@;
       @}
     ;
 

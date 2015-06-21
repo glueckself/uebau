@@ -63,35 +63,33 @@ sRegister* newRegList(void) {
 
 static sRegister* _getNextReg(sRegister *list, const char *name) {
     int i;
-    sRegister *startPos;
+    int startPos=-1;
     
     if(name == NULL) {
-        startPos=list;
+        startPos=0;
     } else {
-        for(i=0; list[i].name != NULL; i++) {
+        for(i=0; i < NUM_REGISTERS; i++) {
             if(strcmp(list[i].name, name) == 0) {
-                startPos=&(list[i+1]);
+                startPos=i+1;
                 break;
             }
         }
-        if(startPos == NULL)
-            return &startPos[0];
-        if(startPos->name == NULL)
-            return &startPos[0];
+        if(startPos == -1)
+            return &list[0];
     }
     
-    for(i=0; startPos[i].name != NULL; i++) {
-	if(startPos[i].ident != NULL)
+    for(i=startPos; i<NUM_REGISTERS; i++) {
+	if(list[i].ident != NULL)
 	    continue;
 
-	if(startPos[i].state == REG_USED)
+	if(list[i].state == REG_USED)
 	  continue;
         
-        return &(startPos[i]);
+        return &(list[i]);
     }
     
     //we should compile all statically correct programs but it doesn't mean to execute them correctly :)
-    return &startPos[0];
+    return &list[0];
 }
 
 
