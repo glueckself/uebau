@@ -13,7 +13,7 @@ static const symbol_t raxReg = {0};
 
 static const sRegister regListTemplate[] = {
     {"rdi", "dil", (symbol_t*)&raxReg, REG_USED},
-    {"rax", "al", NULL, REG_FREE},
+    
     {"r11", "r11b", NULL, REG_FREE},
     
     {"r10", "r10b", NULL, REG_FREE},
@@ -104,7 +104,7 @@ const char* getParamReg() {
 }
 
 const char* getResultReg() {
-  return "rax";
+  return "r11";
 }
 
 void markReg(sRegister *list, const char *regName, eRegState state) {
@@ -123,7 +123,12 @@ void markReg(sRegister *list, const char *regName, eRegState state) {
     
     if(reg->ident != NULL)
       state=REG_USED;
-    
+    /*
+    if(state == REG_USED)
+      printf("marking %s as USED\n", regName);
+    else
+      printf("marking %s as FREE\n", regName);
+    */
     reg->state=state;
 }
   
@@ -182,11 +187,11 @@ static void restoreIdentifiers(sRegister *list) {
 static void move(const char *dstReg, const char *srcReg) {
     if(strcmp(dstReg,srcReg) == 0)
         return;
-    printf("mov %%%s, %%%s\n", srcReg, dstReg);
+    printf("movq %%%s, %%%s\n", srcReg, dstReg);
 }
  
 static void extractNum(const char *reg) {
-    printf("sar $1, %%%s\n", reg);
+    printf("sarq $1, %%%s\n", reg);
     printf("jc raisesig\n");
 }
 
@@ -212,15 +217,15 @@ void genNumFromReg(const char *dstReg, const char *srcReg) {
 
 void genTagNum(const char *dstReg, const char *srcReg) {
     move(dstReg, srcReg);
-    printf("sal $1, %%%s\n", dstReg);
+    printf("salq $1, %%%s\n", dstReg);
 }
 
 static void extractList(const char *reg) {
-    printf("mov $3, %%r12\n");
-    printf("and %%%s, %%r12\n", reg);
+    printf("movq $3, %%r12\n");
+    printf("andq %%%s, %%r12\n", reg);
     printf("cmp $1, %%r12\n");
     printf("jne raisesig\n");
-    printf("sub $1, %%%s\n", reg);
+    printf("subq $1, %%%s\n", reg);
 }
 
 void genListFromIdent(const char *regname, symbol_t *sym) {
@@ -244,13 +249,13 @@ void genListFromReg(const char *dstReg, const char *srcReg) {
 
 void genTagList(const char *dstReg, const char *srcReg) {
     move(dstReg, srcReg);
-    printf("add $1, %%%s\n", dstReg);
+    printf("addq $1, %%%s\n", dstReg);
 }
 
 
 void genTagFunc(const char *dstReg, const char *srcReg) {
     move(dstReg, srcReg);
-    printf("add $3, %%%s\n", dstReg);
+    printf("addq $3, %%%s\n", dstReg);
 }
 
 void genSymbol(const char *fName) {
@@ -271,23 +276,23 @@ void genReturn(const char *dstReg, const char *srcReg) {
 }
 
 void genAdd(const char *dstReg, const char *srcReg1, const char *srcReg2) {
-    printf("add %%%s, %%%s\n", srcReg2, srcReg1);
+    printf("addq %%%s, %%%s\n", srcReg2, srcReg1);
     move(dstReg, srcReg1);
 }
 
 void genAddI(const char *dstReg, const char *srcReg, const long value) {
     move(dstReg, srcReg);
-    printf("add $%ld, %%%s\n", value, dstReg);
+    printf("addq $%ld, %%%s\n", value, dstReg);
 }
 
 void genMinus(const char *dstReg, const char *srcReg1, const char *srcReg2) {
-    printf("sub %%%s, %%%s\n", srcReg2, srcReg1);
+    printf("subq %%%s, %%%s\n", srcReg2, srcReg1);
     move(dstReg, srcReg1);
 }
 
 void genMinusI(const char *dstReg, const char *srcReg, const long value) {
     move(dstReg, srcReg);
-    printf("sub $%ld, %%%s\n", value, dstReg);
+    printf("subq $%ld, %%%s\n", value, dstReg);
 }
     
 void genMult(const char *dstReg, const char *srcReg1, const char *srcReg2) {
@@ -301,13 +306,13 @@ void genMultI(const char *dstReg, const char *srcReg, const long value) {
 }
 
 void genAnd(const char *dstReg, const char *srcReg1, const char *srcReg2) {
-    printf("and %%%s, %%%s\n", srcReg2, srcReg1);
+    printf("andq %%%s, %%%s\n", srcReg2, srcReg1);
     move(dstReg, srcReg1);
 }
 
 void genAndI(const char *dstReg, const char *srcReg, const long value) {
     move(dstReg, srcReg);
-    printf("and $%ld, %%%s\n", value, dstReg);
+    printf("andq $%ld, %%%s\n", value, dstReg);
 }
 
 void genNot(const char *dstReg, const char *srcReg) {
@@ -318,48 +323,48 @@ void genNot(const char *dstReg, const char *srcReg) {
 void genLess(const char *dstReg, const char *srcReg1, const char *srcReg2) {
     printf("cmp %%%s, %%%s\n", srcReg2, srcReg1);
     printf("setl %%%s\n", getByteReg(dstReg));
-    printf("and $1, %%%s\n", dstReg);
+    printf("andq $1, %%%s\n", dstReg);
 }
 
 void genEqual(const char *dstReg, const char *srcReg1, const char *srcReg2) {
     printf("cmp %%%s, %%%s\n", srcReg1, srcReg2);
     printf("sete %%%s\n", getByteReg(dstReg));
-    printf("and $1, %%%s\n", dstReg);
+    printf("andq $1, %%%s\n", dstReg);
 }
 
 void genIsNum(const char *dstReg, const char *srcReg) {
-    printf("sar $1, %%%s\n", srcReg);
+    printf("sarq $1, %%%s\n", srcReg);
     printf("setnc %%%s\n", getByteReg(dstReg));
-    printf("and $1, %%%s\n", dstReg);
+    printf("andq $1, %%%s\n", dstReg);
 }
 
 void genIsList(const char *dstReg, const char *srcReg) {
-    printf("mov $3, %%r12\n");
-    printf("and %%%s, %%r12\n", srcReg);
+    printf("movq $3, %%r12\n");
+    printf("andq %%%s, %%r12\n", srcReg);
     printf("cmp $1, %%r12\n");
     printf("sete %%%s\n", getByteReg(dstReg));
-    printf("and $1, %%%s\n", dstReg);
+    printf("andq $1, %%%s\n", dstReg);
 }
 
 void genIsFun(const char *dstReg, const char *srcReg) {
     printf("test $3, %%%s\n", srcReg);
     printf("sete %%%s\n", getByteReg(dstReg));
-    printf("and $1, %%%s\n", dstReg);
+    printf("andq $1, %%%s\n", dstReg);
 }
 
 void genDot(const char *dstReg, const char *srcReg, const char *srcReg2) {
-    printf("mov %%%s, 0(%%r15)\n", srcReg);
-    printf("mov %%%s, 8(%%r15)\n", srcReg2);
-    printf("mov %%r15, %%%s\n", dstReg);
-    printf("add $16, %%r15\n");
+    printf("movq %%%s, 0(%%r15)\n", srcReg);
+    printf("movq %%%s, 8(%%r15)\n", srcReg2);
+    printf("movq %%r15, %%%s\n", dstReg);
+    printf("addq $16, %%r15\n");
 }
 
 void genHead(const char *dstReg, const char *srcReg) {
-     printf("mov 0(%%%s), %%%s\n", srcReg, dstReg);
+     printf("movq 0(%%%s), %%%s\n", srcReg, dstReg);
 }
 
 void genTail(const char *dstReg, const char *srcReg) {
-     printf("mov 8(%%%s), %%%s\n", srcReg, dstReg);
+     printf("movq 8(%%%s), %%%s\n", srcReg, dstReg);
 }
 
 void assignFromIdent(const char *dstReg, const char *srcReg ) {
@@ -367,7 +372,7 @@ void assignFromIdent(const char *dstReg, const char *srcReg ) {
 }
 
 void assignFromNum(const char *reg, long value) {
-    printf("mov $%ld, %%%s\n", value, reg);
+    printf("movq $%ld, %%%s\n", value, reg);
 }
 
 void genIf(const char *reg, int labelNum) {
@@ -404,20 +409,20 @@ void genClosure(const char *dstReg, const char *label, symbol_t *symbols) {
     move(dstReg, "r15");
     
     
-    printf("add $16, %%r15\n");
+    printf("addq $16, %%r15\n");
     
     printf("movq $%s, 0(%%%s)\n", label, dstReg);
-    printf("mov %%r15, 8(%%%s)\n", dstReg);
+    printf("movq %%r15, 8(%%%s)\n", dstReg);
     
     for(e=symbols; e != NULL; e=e->next) {
       if(e->offset == -1)
 	continue;
       
-      printf("mov %%%s, %d(%%r15)\n", e->regname, e->offset);
+      printf("movq %%%s, %d(%%r15)\n", e->regname, e->offset);
       symCnt++;
     }
     
-    printf("add $%d, %%r15\n", symCnt*8);
+    printf("addq $%d, %%r15\n", symCnt*8);
 }
 
 const char* labelNameFromNum(const char *prefix, int num) {
@@ -442,7 +447,7 @@ void restoreEnvironment(sRegister *regList, symbol_t *list) {
     reg=getNextReg(regList,reg);
     assignIdentToReg(regList, reg, e);
     
-    printf("mov %d(%%r12), %%%s\n", e->offset, e->regname);
+    printf("movq %d(%%r12), %%%s\n", e->offset, e->regname);
   }
 }
 
@@ -450,7 +455,7 @@ void restoreEnvironment(sRegister *regList, symbol_t *list) {
 void genClosureCall(sRegister *regList, const char *dstReg, const char *clsrReg, const char *srcReg) {
     saveIdentifiers(regList);
     move("rdi", srcReg);
-    printf("mov 8(%%%s), %%r12\n", clsrReg);
+    printf("movq 8(%%%s), %%r12\n", clsrReg);
     printf("call *(%%%s)\n", clsrReg);
     move(dstReg, "rax");
     restoreIdentifiers(regList);
@@ -459,5 +464,5 @@ void genClosureCall(sRegister *regList, const char *dstReg, const char *clsrReg,
 
 void genClosureFromReg(const char *dstReg, const char *srcReg) {
   move(dstReg, srcReg);
-  printf("sub $3, %%%s\n", dstReg);
+  printf("subq $3, %%%s\n", dstReg);
 }

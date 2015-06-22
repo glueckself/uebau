@@ -62,7 +62,6 @@ Program: Def SEMICOLON @{
              @i @Program.globSym@ = mkList(@Def.globVal@);
              @i @Def.globSym@ = @Program.globSym@;
          @}
-/*       | @{ @i @Program.globSym@ = NULL; @}*/
        | Program Def SEMICOLON @{
              @i @Program.globSym@ = addGlobalSymbol(@Program.1.globSym@, @Def.globVal@);
              @i @Def.globSym@ = @Program.globSym@;
@@ -99,7 +98,7 @@ Lambda:	FUN IDENT ARROW Expr END @{
             @reg @Expr.node@->regList = @Lambda.regList@;
             
 	    @codegen genLabel(@Lambda.node@->name);
-	    @codegen if(@Lambda.node@->labelNum >= 0) restoreEnvironment(@Lambda.regList@, @Lambda.sym@);
+	    @codegen if(@Lambda.node@->labelNum >= 0) {markReg(@Lambda.regList@, @Lambda.node@->regname, REG_USED); restoreEnvironment(@Lambda.regList@, @Lambda.sym@);}
 	    @codegen burm_label(@Lambda.node@); burm_reduce(@Lambda.node@, 1);
         @}
       ;
@@ -228,8 +227,8 @@ KExpr: NOT EExpr @{
 AddTerm: Term PLUS Term @{
             @i @AddTerm.node@ = newNode(OP_PLUS, @Term.0.node@, @Term.1.node@);
             
-          @reg @Term.0.node@->regname = @AddTerm.node@->regname;
           @reg @Term.1.node@->regname = getNextReg(@AddTerm.regList@, @AddTerm.node@->regname);
+          @reg @Term.0.node@->regname = @AddTerm.node@->regname;
           @reg @Term.0.node@->regList = @AddTerm.0.regList@;
           @reg @Term.1.node@->regList = @AddTerm.0.regList@;
           
