@@ -3,6 +3,26 @@
 #ifdef DEBUG
 #include "burm_string.h"
 #endif
+
+#define GEN_CALL_HELPER(bnode, kid0, kid1) do { 						\
+  if((kid0)->ident->offset < 0) {								\
+    genCallSymbol((bnode)->regList, (bnode)->regname, (kid0)->ident->name, (kid1)->regname);	\
+    markReg((bnode)->regList, (kid1)->regname, REG_FREE);					\
+    markReg((bnode)->regList, (bnode)->regname, REG_USED);					\
+  } else {											\
+    genClosureCall((bnode)->regList, (bnode)->regname, (kid0)->ident->regname, (kid1)->regname);\
+    markReg((bnode)->regList, (kid1)->regname, REG_FREE);					\
+    markReg((bnode)->regList, (bnode)->regname, REG_USED);					\
+  }												\
+} while(0)
+
+#define GEN_CLOSURE_CALL_HELPER(bnode, kid0, kid1) do {						\
+  markReg((bnode)->regList, (kid1)->regname, REG_FREE);						\
+  markReg((bnode)->regList, (kid0)->regname, REG_FREE);						\
+  genClosureCall((bnode)->regList, (bnode)->regname, (kid0)->regname, (kid1)->regname);		\
+  markReg((bnode)->regList, (bnode)->regname, REG_USED);					\
+} while(0)
+
 %}
 
 %term OP_PLUS=1 OP_MINUS=2 OP_MULT=3 OP_AND=4 OP_NOT=5 OP_LESS=6 OP_EQUAL=7 OP_ISNUM=8 OP_ISLIST=9 OP_ISFUN=10 OP_DOT=11 OP_HEAD=12 OP_TAIL=13 OP_CALL=14 OP_IDENT=15 OP_NUM=16 OP_EVAL=17 OP_IF=18 OP_CONDEVAL=19 OP_LET=20 OP_CLOSURE=21
@@ -20,16 +40,15 @@ expr: OP_HEAD(listexpr)               # 1 # genHead(bnode->regname, kids[0]->reg
 expr: OP_TAIL(listexpr)               # 1 # genTail(bnode->regname, kids[0]->regname); SINGLE_ASSIGN(bnode->regList, bnode->regname, kids[0]->regname);
 expr: OP_IDENT                        # 1 # assignFromIdent(bnode->regname, bnode->ident->regname); markReg(bnode->regList, bnode->regname, REG_USED);
 
-expr: OP_IF(expr)                     # 1 # genIf(bnode->regname, bnode->labelNum); burm_label(bnode->kids[1]); burm_reduce(bnode->kids[1],1); markReg(bnode->regList, bnode->regname, REG_FREE);
+expr: OP_IF(expr)                     # 1 # genIf(bnode->regname, bnode->labelNum); markReg(bnode->regList, bnode->regname, REG_FREE); burm_label(bnode->kids[1]); burm_reduce(bnode->kids[1],1);
 expr: OP_LET(expr)                    # 1 # burm_label(bnode->kids[1]); burm_reduce(bnode->kids[1], 1);
-expr: OP_CALL(ident, expr)            # 1 # if(kids[0]->ident->offset < 0) genCallSymbol(bnode->regList, bnode->regname, kids[0]->ident->name, kids[1]->regname); else genClosureCall(bnode->regList, bnode->regname, kids[0]->ident->regname, kids[1]->regname);
-expr: OP_CALL(fexpr, expr)            # 1 # genClosureCall(bnode->regList, bnode->regname, kids[0]->regname, kids[1]->regname);
-
-fexpr: OP_CLOSURE                     # 1 # genClosure(bnode->regname, bnode->kids[0]->name, bnode->ident);
+expr: OP_CALL(ident, expr)            # 1 # GEN_CALL_HELPER(bnode,kids[0],kids[1]);
+expr: OP_CALL(fexpr, expr)            # 1 # GEN_CLOSURE_CALL_HELPER(bnode,kids[0],kids[1]);
+fexpr: OP_CLOSURE                     # 1 # genClosure(bnode->regname, bnode->kids[0]->name, bnode->ident); markReg(bnode->regList, bnode->regname, REG_USED);
 fexpr: expr                           # 1 # genClosureFromReg(bnode->regname, kids[0]->regname); SINGLE_ASSIGN(bnode->regList, bnode->regname, kids[0]->regname);
 
 condeval: OP_CONDEVAL(thenexpr, elseexpr) # 0 #  
-thenexpr: expr                        # 0 # genElseLabel(bnode->regname, bnode->parent->labelNum);
+thenexpr: expr                        # 0 # genElseLabel(bnode->regname, bnode->parent->labelNum); markReg(bnode->regList, bnode->regname, REG_FREE);
 elseexpr: expr                        # 0 # genEndIfLabel(bnode->regname, bnode->parent->labelNum);
 
 listexpr: OP_DOT(expr, expr)          # 1 # genDot(bnode->regname, kids[0]->regname, kids[1]->regname); DOUBLE_ASSIGN(bnode->regList, bnode->regname, kids[0]->regname, kids[1]->regname);
@@ -75,5 +94,6 @@ imm: OP_ISLIST(imm)          # 0 # bnode->val = 0;
 imm: OP_NUM                  # 0
 
 ident:	OP_IDENT		# 0 #
+ident:	fexpr			# 0 #
 
 %%

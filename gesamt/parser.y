@@ -228,8 +228,8 @@ KExpr: NOT EExpr @{
 AddTerm: Term PLUS Term @{
             @i @AddTerm.node@ = newNode(OP_PLUS, @Term.0.node@, @Term.1.node@);
             
-          @reg @Term.0.node@->regname = @AddTerm.node@->regname;
           @reg @Term.1.node@->regname = getNextReg(@AddTerm.regList@, @AddTerm.node@->regname);
+          @reg @Term.0.node@->regname = @AddTerm.node@->regname;
           @reg @Term.0.node@->regList = @AddTerm.0.regList@;
           @reg @Term.1.node@->regList = @AddTerm.0.regList@;
           

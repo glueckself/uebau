@@ -13,7 +13,7 @@ static const symbol_t raxReg = {0};
 
 static const sRegister regListTemplate[] = {
     {"rdi", "dil", (symbol_t*)&raxReg, REG_USED},
-    {"rax", "al", NULL, REG_FREE},
+    
     {"r11", "r11b", NULL, REG_FREE},
     
     {"r10", "r10b", NULL, REG_FREE},
@@ -104,7 +104,7 @@ const char* getParamReg() {
 }
 
 const char* getResultReg() {
-  return "rax";
+  return "r11";
 }
 
 void markReg(sRegister *list, const char *regName, eRegState state) {
@@ -123,7 +123,12 @@ void markReg(sRegister *list, const char *regName, eRegState state) {
     
     if(reg->ident != NULL)
       state=REG_USED;
-    
+    /*
+    if(state == REG_USED)
+      printf("marking %s as USED\n", regName);
+    else
+      printf("marking %s as FREE\n", regName);
+    */
     reg->state=state;
 }
   
